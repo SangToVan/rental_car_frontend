@@ -7,6 +7,62 @@ import hanoi from "../assets/ha-noi.jpg";
 import hcm from "../assets/ho-chi-minh-city.jpg";
 import qn from "../assets/quang-ninh.jpg";
 
+export const mockNotice = [
+  {
+    id: 1,
+    type: "trip_cancel",
+    title: "Chủ xe hủy chuyến",
+    message:
+      "Chủ xe Trần Nguyễn Hải đã hủy chuyến đi HEC6SXBY, xe HYUNDAI CUSTIN LUXURY 2024, T5 21:00 24/04/2025 - T6 20:00 25/04/2025.",
+    time: "19 giờ trước",
+    read: false,
+  },
+  {
+    id: 2,
+    type: "trip_cancel",
+    title: "Chủ xe hủy chuyến",
+    message:
+      "Chủ xe PHẠM VĂN PHƯƠNG đã hủy chuyến đi FVY4EYR9, xe CHEVROLET CRUZE 2018, T5 21:00 24/04/2025 - T6 20:00 25/04/2025.",
+    time: "19 giờ trước",
+    read: false,
+  },
+  {
+    id: 3,
+    type: "approval",
+    title: "Kiểm duyệt xe",
+    message: "Yêu cầu đăng kí xe 98D-234567 bị từ chối phê duyệt.",
+    time: "1 ngày trước",
+    read: false,
+  },
+  // Add more notifications to test scrolling
+  {
+    id: 4,
+    type: "trip_cancel",
+    title: "Chủ xe hủy chuyến",
+    message:
+      "Chủ xe Nguyễn Văn A đã hủy chuyến đi ABC1234, xe TOYOTA VIOS 2022, T2 09:00 22/04/2025 - T3 18:00 23/04/2025.",
+    time: "2 ngày trước",
+    read: false,
+  },
+  {
+    id: 5,
+    type: "approval",
+    title: "Kiểm duyệt xe",
+    message: "Yêu cầu đăng kí xe 51F-678910 đã được phê duyệt.",
+    time: "3 ngày trước",
+    read: true,
+  },
+  {
+    id: 6,
+    type: "trip_cancel",
+    title: "Thông báo hệ thống",
+    message:
+      "Cập nhật chính sách mới về việc thuê xe trên Mioto. Vui lòng xem chi tiết tại đây.",
+    time: "4 ngày trước",
+    read: true,
+  },
+];
+
 export const mockCars = [
   {
     id: "KE7XZ6",

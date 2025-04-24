@@ -12,13 +12,14 @@ export default function SearchForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle search logic
-    navigate(
-      `/find/filter?address=${encodeURIComponent(
-        location
-      )}&startDate=${encodeURIComponent(
-        startDate
-      )}&endDate=${encodeURIComponent(endDate)}`
-    );
+    // navigate(
+    //   `/find/filter?address=${encodeURIComponent(
+    //     location
+    //   )}&startDate=${encodeURIComponent(
+    //     startDate
+    //   )}&endDate=${encodeURIComponent(endDate)}`
+    // );
+    navigate("/search");
   };
   return (
     <div className="p-4 bg-white rounded-lg shadow-lg">
