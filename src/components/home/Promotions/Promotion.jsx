@@ -1,4 +1,4 @@
-import { PromotionCard } from "../cards/PromotionCard";
+import { PromotionCard } from "./PromotionCard";
 import { mockPromotions } from "/src/utils/mockData.js";
 
 export default function Promotion() {

@@ -1,4 +1,4 @@
-import { LocationCard } from "../cards/LocationCard";
+import { LocationCard } from "./LocationCard";
 import { mockLocations } from "/src/utils/mockData.js";
 
 export default function Location() {

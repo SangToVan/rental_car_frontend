@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "../buttons/Button";
+import Button from "../buttons/Button";
 
 export default function SearchForm() {
   const navigate = useNavigate();

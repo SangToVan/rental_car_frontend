@@ -97,3 +97,5 @@ export const CarCard = ({
     </Link>
   );
 };
+
+export default CarCard;

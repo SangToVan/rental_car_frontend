@@ -6,7 +6,7 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export const CarGallery = ({ images , alt, className }) => {
+export const CarGallery = ({ images, alt, className }) => {
   const [mainImage, setMainImage] = useState(images[0]);
 
   if (images.length === 0) {
@@ -65,3 +65,5 @@ export const CarGallery = ({ images , alt, className }) => {
     </div>
   );
 };
+
+export default CarGallery;

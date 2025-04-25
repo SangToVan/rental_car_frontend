@@ -1,9 +1,9 @@
 import Hero from "../components/home/Hero";
-import Promotion from "../components/home/Promotion";
+import Promotion from "../components/home/Promotions/Promotion";
 import Suggestion from "../components/home/Suggestion";
-import Location from "../components/home/Location";
-import Features from "../components/home/Features";
-import Blog from "../components/home/Blog";
+import Location from "../components/home/Locations/Location";
+import About from "../components/home/About";
+import Blog from "../components/home/Blogs/Blog";
 
 export default function Home() {
   return (
@@ -13,7 +13,7 @@ export default function Home() {
         <Promotion />
         <Suggestion />
         <Location />
-        <Features />
+        <About />
         <Blog />
       </div>
     </>

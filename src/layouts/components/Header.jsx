@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import logoImg from "/src/assets/logo.png";
-import LoginModal from "/src/components/modals/LoginModal";
-import SignupModal from "/src/components/modals/SignupModal";
-import NoticeDropdown from "/src/components/notifications/NoticeDropdown";
+import logoImg from "../../assets/logo.png";
+import LoginModal from "../../components/modals/AuthModal/LoginModal";
+import SignupModal from "../../components/modals/AuthModal/SignupModal";
+import NoticeDropdown from "../../components/home/Notifications/NoticeDropdown";
 import { useState } from "react";
 import { mockNotice } from "/src/utils/mockData.js";
 
@@ -43,7 +43,7 @@ export default function Header({ isLoggedIn, setIsLoggedIn }) {
               </Link>
               {isLoggedIn && (
                 <Link
-                  to="/trips"
+                  to="/booking"
                   className="font-medium text-mioto-dark hover:text-primary"
                 >
                   Chuyến của tôi
@@ -85,32 +85,34 @@ export default function Header({ isLoggedIn, setIsLoggedIn }) {
                   </div>
 
                   {/* User Profile */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center justify-center w-10 h-10 font-bold text-white bg-blue-500 rounded-full">
-                      S
-                    </div>
-                    <div className="relative group">
-                      <div className="flex items-center gap-1 cursor-pointer">
-                        <span className="text-sm font-medium">
-                          Sinh viên tìm tài liệu
-                        </span>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          className="w-4 h-4 text-gray-600"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
+                  <Link to="/user/profile">
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center w-10 h-10 font-bold text-white bg-blue-500 rounded-full">
+                        S
+                      </div>
+                      <div className="relative group">
+                        <div className="flex items-center gap-1 cursor-pointer">
+                          <span className="text-sm font-medium">
+                            Sinh viên tìm tài liệu
+                          </span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            className="w-4 h-4 text-gray-600"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 </>
               ) : (
                 <>

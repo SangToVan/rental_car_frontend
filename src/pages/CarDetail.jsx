@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { mockCars } from "/src/utils/mockData.js";
-import { CarGallery } from "../components/common/CarGallery";
+import { mockCars } from "../utils/mockData";
+import CarGallery from "../components/common/CarGallery";
 import Features from "../components/common/Features";
 import Reviews from "../components/common/Reviews";
-import { Button } from "../components/buttons/Button";
-import { CarCard } from "../components/cards/CarCard";
+import Button from "../components/buttons/Button";
+import CarCard from "../components/cars/CarCard";
 
 export default function CarDetail() {
   const { id } = useParams();

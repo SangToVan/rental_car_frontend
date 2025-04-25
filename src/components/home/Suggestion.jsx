@@ -1,6 +1,6 @@
-import { mockCars } from "/src/utils/mockData.js";
-import { CarCard } from "../cards/CarCard";
-import { Button } from "../buttons/Button";
+import { mockCars } from "../../utils/mockData";
+import CarCard from "../cars/CarCard";
+import Button from "../buttons/Button";
 
 export default function Suggestion() {
   return (

@@ -1,4 +1,4 @@
-export default function Features() {
+export default function About() {
   return (
     <>
       {/* Features Section */}

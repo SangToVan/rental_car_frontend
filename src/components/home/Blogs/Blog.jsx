@@ -1,4 +1,4 @@
-import { Button } from "../buttons/Button";
+import { Button } from "../../buttons/Button";
 import hanoi from "/src/assets/ha-noi.jpg";
 
 export default function Blog() {
