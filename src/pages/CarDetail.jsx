@@ -4,8 +4,10 @@ import { mockCars } from "../utils/mockData";
 import CarGallery from "../components/common/CarGallery";
 import Features from "../components/common/Features";
 import Reviews from "../components/common/Reviews";
-import Button from "../components/buttons/Button";
+import Button from "../components/ui/Button";
 import CarCard from "../components/cars/CarCard";
+import BookingDetailModal from "../components/modals/ConfirmModal/BookingDetailModal";
+import BookingConfirmModal from "../components/modals/ConfirmModal/BookingConfirmModal";
 
 export default function CarDetail() {
   const { id } = useParams();
@@ -13,6 +15,8 @@ export default function CarDetail() {
   const [similarCars, setSimilarCars] = useState([]);
   const [startDate, setStartDate] = useState("04/04/2025 21:00");
   const [endDate, setEndDate] = useState("05/04/2025 20:00");
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
 
   useEffect(() => {
     // In a real app, we would fetch the car data from an API
@@ -30,6 +34,29 @@ export default function CarDetail() {
       setSimilarCars(similar);
     }
   }, [id]);
+
+  const handleOpenBookingModal = () => {
+    setIsBookingModalOpen(true);
+  };
+
+  const handleCloseBookingModal = () => {
+    setIsBookingModalOpen(false);
+  };
+
+  const handleOpenConfirmModal = () => {
+    setIsBookingModalOpen(false);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleCloseConfirmModal = () => {
+    setIsConfirmModalOpen(false);
+  };
+
+  const handleConfirmBooking = () => {
+    setIsConfirmModalOpen(false);
+    // Here you would typically submit the booking to your backend
+    alert("Đặt xe thành công! Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.");
+  };
 
   if (!car) {
     return (
@@ -231,7 +258,9 @@ export default function CarDetail() {
                 </div>
               </div>
 
-              <Button className="w-full">CHỌN THUÊ</Button>
+              <Button className="w-full" onClick={handleOpenBookingModal}>
+                CHỌN THUÊ
+              </Button>
 
               <div className="mt-4">
                 <h4 className="mb-2 text-sm font-medium">
@@ -287,6 +316,23 @@ export default function CarDetail() {
           </div>
         </div>
       </div>
+
+      {/* Booking Detail Modal */}
+      <BookingDetailModal
+        isOpen={isBookingModalOpen}
+        onClose={handleCloseBookingModal}
+        car={car}
+        startDate={startDate}
+        endDate={endDate}
+        onConfirm={handleOpenConfirmModal}
+      />
+
+      {/* Confirmation Modal */}
+      <BookingConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={handleCloseConfirmModal}
+        onConfirm={handleConfirmBooking}
+      />
     </div>
   );
 }
