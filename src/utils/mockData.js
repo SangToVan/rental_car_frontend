@@ -426,6 +426,52 @@ export const mockCarData = [
   },
 ];
 
+export const mockBookings = [
+  {
+    id: "B123456",
+    car: mockCars[3], // TOYOTA VELOZ CROSS 2022
+    startDate: "21:00 - 24/04/2025",
+    endDate: "20:00 - 25/04/2025",
+    status: "approved",
+    price: {
+      basePrice: 610000,
+      serviceFee: 90280,
+      insurance: 62831,
+      discount: 100000,
+      total: 663111,
+      depositAmount: 265111,
+      remainingAmount: 398000,
+    },
+    pickupLocation: "Quận Bình Thạnh, TP Hồ Chí Minh",
+    dropoffLocation: "Quận Bình Thạnh, TP Hồ Chí Minh",
+    requirementMessage:
+      "Chào anh chủ xe! Tôi cần thuê xe của anh để đi du lịch cùng gia đình với thời gian như trên. Tôi có đầy đủ giấy tờ thuê xe và tài sản thế chấp như yêu cầu.",
+    bookingDate: "23/04/2025",
+  },
+  {
+    id: "B123457",
+    car: mockCars[1], // MITSUBISHI XPANDER 2020
+    startDate: "09:00 - 29/04/2025",
+    endDate: "18:00 - 30/04/2025",
+    status: "cancelled",
+    price: {
+      basePrice: 610000,
+      serviceFee: 90280,
+      insurance: 62831,
+      discount: 100000,
+      total: 983350,
+      depositAmount: 392350,
+      remainingAmount: 591000,
+    },
+    cancellationReason: "Tôi cần hủy chuyến vì có việc đột xuất",
+    pickupLocation: "Quận Bình Thạnh, TP Hồ Chí Minh",
+    dropoffLocation: "Quận Bình Thạnh, TP Hồ Chí Minh",
+    requirementMessage:
+      "Chào anh chủ xe! Tôi cần thuê xe của anh để đi du lịch cùng gia đình với thời gian như trên. Tôi có đầy đủ giấy tờ thuê xe và tài sản thế chấp như yêu cầu.",
+    bookingDate: "20/04/2025",
+  },
+];
+
 export const mockPromotions = [
   {
     id: "P1",

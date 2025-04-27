@@ -12,6 +12,7 @@ import Favorite from "./components/profile/contents/Favorite";
 import MyBooking from "./components/profile/contents/MyBooking";
 import MyCar from "./components/profile/contents/MyCar";
 import ChangePassword from "./components/profile/contents/ChangePassword";
+import BookingDetail from "./pages/BookingDetail";
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
               <Route path="user/cars" element={<MyCar />} />
               <Route path="user/change-password" element={<ChangePassword />} />
             </Route>
+            <Route path="booking/:id" element={<BookingDetail />} />
           </Route>
         </Routes>
       </BrowserRouter>
