@@ -1,277 +1,667 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState } from "react";
+import ProgressSteps from "../components/bookings/ProgressSteps";
+import BookingNotice from "../components/bookings/common/BookingNotice";
+import CarInformation from "../components/bookings/booking-infor/CarInformation";
+import OwnerInformation from "../components/bookings/booking-infor/OwnerInformation";
+import BookingSummary from "../components/bookings/booking-infor/BookingSummary";
+import RentalPeriod from "../components/bookings/common/RentalPeriod";
+import RentalDocuments from "../components/bookings/common/RentalDocuments";
+import RentalAccessories from "../components/bookings/common/RentalAccessories";
+import RentalTerms from "../components/bookings/common/RentalTerms";
+import CancellationPolicy from "../components/bookings/common/CancellationPolicy";
+import PaymentOption from "../components/bookings/payment/PaymentOption";
+import Reviews from "../components/bookings/reviews/Reviews";
 import { mockBookings } from "../utils/mockData";
-import BookingStep1 from "../components/bookings/BookingStep1";
+import { useBooking } from "../components/context/BookingContext";
 
 export default function BookingDetail() {
-  const { id } = useParams();
-  const [booking, setBooking] = useState(null);
+  // Use global state from context
+  const {
+    bookingStatus,
+    currentStep,
+    bookingData,
+    updateBookingStatus,
+    averageRating,
+    reviewList,
+  } = useBooking();
 
-  useEffect(() => {
-    // Simulate fetching booking data
-    const foundBooking = mockBookings.find((booking) => booking.id === id);
-    if (foundBooking) {
-      setBooking(foundBooking);
-    } else {
-      // If no booking found, use the first one for demo purposes
-      setBooking(mockBookings[0]);
-    }
-  }, [id]);
+  // Local UI state
+  const [paymentOption, setPaymentOption] = useState("partial");
+  const [showCancelled, setShowCancelled] = useState(false);
 
-  if (!booking) {
-    return (
-      <div className="container py-12">
-        <h1 className="mb-4 text-2xl font-bold">
-          Đang tải thông tin đặt xe...
-        </h1>
-      </div>
-    );
-  }
+  const car = bookingData.car;
 
-  // Determine the status step
-  const bookingStatusSteps = [
-    {
-      id: 1,
-      name: "Gửi yêu cầu",
-      status: booking.status !== "cancelled" ? "complete" : "cancelled",
-    },
-    {
-      id: 2,
-      name: "Duyệt yêu cầu",
-      status: ["approved", "active", "completed"].includes(booking.status)
-        ? "complete"
-        : booking.status === "cancelled"
-        ? "cancelled"
-        : "upcoming",
-    },
-    {
-      id: 3,
-      name: "Thanh toán giữ chỗ",
-      status: ["approved", "active", "completed"].includes(booking.status)
-        ? "complete"
-        : booking.status === "cancelled"
-        ? "cancelled"
-        : "upcoming",
-    },
-    {
-      id: 4,
-      name: "Khởi hành",
-      status: ["active", "completed"].includes(booking.status)
-        ? "complete"
-        : booking.status === "cancelled"
-        ? "cancelled"
-        : "upcoming",
-    },
-    {
-      id: 5,
-      name: "Kết thúc",
-      status:
-        booking.status === "completed"
-          ? "complete"
-          : booking.status === "cancelled"
-          ? "cancelled"
-          : "upcoming",
-    },
-  ];
+  // Utility function to format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN").format(amount) + " VND";
+  };
 
-  // Define icons for each step
-  const stepIcons = {
-    1: (status) => (
-      <svg
-        className={`w-5 h-5 ${
-          status === "complete"
-            ? "text-white"
-            : status === "cancelled"
-            ? "text-white"
-            : "text-gray-500"
-        }`}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-        />
-      </svg>
-    ),
-    2: (status) => (
-      <svg
-        className={`w-5 h-5 ${
-          status === "complete"
-            ? "text-white"
-            : status === "cancelled"
-            ? "text-white"
-            : "text-gray-500"
-        }`}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-        />
-      </svg>
-    ),
-    3: (status) => (
-      <svg
-        className={`w-5 h-5 ${
-          status === "complete"
-            ? "text-white"
-            : status === "cancelled"
-            ? "text-white"
-            : "text-gray-500"
-        }`}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2z"
-        />
-      </svg>
-    ),
-    4: (status) => (
-      <svg
-        className={`w-5 h-5 ${
-          status === "complete"
-            ? "text-white"
-            : status === "cancelled"
-            ? "text-white"
-            : "text-gray-500"
-        }`}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M13 10V3L4 14h7v7l9-11h-7z"
-        />
-      </svg>
-    ),
-    5: (status) => (
-      <svg
-        className={`w-5 h-5 ${
-          status === "complete"
-            ? "text-white"
-            : status === "cancelled"
-            ? "text-white"
-            : "text-gray-500"
-        }`}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      </svg>
-    ),
+  // Handle payment option change
+  const handlePaymentOptionChange = (option) => {
+    setPaymentOption(option);
+  };
+
+  // Toggle cancelled notification (for demo purposes)
+  const toggleNotification = () => {
+    setShowCancelled(!showCancelled);
   };
 
   return (
-    <div className="container py-8">
-      {/* Booking status section */}
-      {booking.status === "cancelled" ? (
-        <div className="flex items-center p-4 mb-6 rounded-lg bg-red-50">
-          <svg
-            className="w-6 h-6 mr-3 text-red-500"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <div>
-            <h2 className="text-lg font-medium text-red-700">
-              Chủ xe đã từ chối
-            </h2>
-            <p className="mt-1 text-sm text-red-600">
-              {booking.cancellationReason ||
-                "Lý do: Chủ xe không thể cho thuê xe vào thời gian này"}
-            </p>
-          </div>
-        </div>
-      ) : (
-        <div className="p-6 mb-8 rounded-lg bg-green-50">
-          <div className="flex items-center mb-4">
-            <svg
-              className="w-6 h-6 mr-3 text-green-500"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+    <div className="py-8 bg-gray-100">
+      <div className="container px-4 mx-auto">
+        <ProgressSteps currentStep={currentStep} />
+
+        {/* Render different content based on booking status */}
+        {bookingStatus === "pending" && (
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+            <div className="space-y-8 lg:col-span-2">
+              <BookingNotice
+                status={bookingStatus}
+                timeRemaining="1 giờ 36 phút"
+                notificationText="Thời gian thanh toán giữ chỗ còn lại 1 giờ 36 phút"
               />
-            </svg>
-            <span className="font-medium text-green-700">
-              Thời gian thanh toán giữ chỗ còn lại:{" "}
-              <b>11 giờ 28 phút 35 giây</b>
-            </span>
-          </div>
 
-          {/* Progress steps */}
-          <div className="relative flex items-center justify-between">
-            {/* Progress line */}
-            <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-gray-200 -translate-y-1/2 z-0"></div>
+              <CarInformation booking={mockBookings[0]} />
+              <RentalPeriod />
+              <RentalDocuments />
+              <RentalAccessories />
+              <RentalTerms />
+              <CancellationPolicy />
 
-            {bookingStatusSteps.map((step) => (
-              <div
-                key={step.id}
-                className="relative z-10 flex flex-col items-center"
-              >
-                {step.status === "complete" ? (
-                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary">
-                    {stepIcons[step.id](step.status)}
-                  </div>
-                ) : step.status === "cancelled" ? (
-                  <div className="flex items-center justify-center w-12 h-12 bg-red-500 rounded-full">
-                    <svg
-                      className="w-5 h-5 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                      />
-                    </svg>
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center w-12 h-12 bg-white border-2 border-gray-300 rounded-full">
-                    {stepIcons[step.id](step.status)}
-                  </div>
-                )}
-                <div className="mt-2 text-sm text-center">{step.name}</div>
+              {/* Navigation Button */}
+              <div className="flex justify-end mb-8">
+                <button
+                  onClick={() => updateBookingStatus("confirm")}
+                  className="px-6 py-3 font-semibold text-white transition duration-300 bg-green-500 rounded-lg hover:bg-green-600"
+                >
+                  Tiếp tục
+                </button>
               </div>
-            ))}
-          </div>
-        </div>
-      )}
+            </div>
 
-      <BookingStep1 booking={booking} setBooking={setBooking} />
+            <div className="space-y-8 lg:col-span-1">
+              <OwnerInformation owner={mockBookings[0].car.owner} />
+              <BookingSummary status={bookingStatus} />
+            </div>
+          </div>
+        )}
+
+        {bookingStatus === "confirm" && (
+          <div className="p-8 mb-8 bg-white rounded-lg shadow-sm">
+            <h2 className="mb-6 text-2xl font-bold text-gray-800">
+              Duyệt yêu cầu
+            </h2>
+
+            {showCancelled ? (
+              <BookingNotice
+                status="cancelled"
+                cancelReason={mockBookings[1].cancellationReason}
+              />
+            ) : (
+              <BookingNotice
+                status="pending"
+                timeRemaining="1 giờ 36 phút"
+                notificationText="Đang chờ chủ xe phê duyệt yêu cầu"
+              />
+            )}
+
+            <div className="mt-4 mb-6">
+              <button
+                onClick={toggleNotification}
+                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300"
+              >
+                {showCancelled
+                  ? "Hiển thị thông báo 'Pending'"
+                  : "Hiển thị thông báo 'Cancelled'"}
+              </button>
+            </div>
+
+            {showCancelled && (
+              <div className="p-4 mb-6 border border-gray-200 rounded-lg">
+                <h3 className="mb-4 font-medium text-gray-700">
+                  Thông tin xe bị hủy
+                </h3>
+                <div className="flex flex-col gap-4 md:flex-row">
+                  <div className="w-full md:w-1/3">
+                    <img
+                      src={mockBookings[1].car.images[0]}
+                      alt={mockBookings[1].car.name}
+                      className="object-cover w-full h-auto rounded-lg"
+                    />
+                  </div>
+                  <div className="w-full md:w-2/3">
+                    <p className="text-lg font-semibold">
+                      {mockBookings[1].car.name}
+                    </p>
+                    <div className="grid grid-cols-1 gap-2 mt-2 md:grid-cols-2">
+                      <div>
+                        <p className="text-gray-600">Thời gian thuê:</p>
+                        <p className="font-medium">
+                          {mockBookings[1].startDate} đến{" "}
+                          {mockBookings[1].endDate}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Giá thuê:</p>
+                        <p className="font-medium">
+                          {formatCurrency(mockBookings[1].price.total)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Example content for Step 2 */}
+            <div className="mt-6 space-y-6">
+              <div className="p-4 border border-gray-200 rounded-lg">
+                <h3 className="mb-2 font-medium text-gray-700">
+                  Thông tin duyệt yêu cầu
+                </h3>
+                <p className="text-gray-600">
+                  Chủ xe đang xem xét yêu cầu của bạn và sẽ phản hồi trong thời
+                  gian sớm nhất.
+                </p>
+              </div>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8">
+              <button
+                onClick={() => updateBookingStatus("pending")}
+                className="px-6 py-3 font-semibold text-white transition duration-300 bg-gray-500 rounded-lg hover:bg-gray-600"
+              >
+                Quay lại
+              </button>
+              <button
+                onClick={() => updateBookingStatus("payment")}
+                className="px-6 py-3 font-semibold text-white transition duration-300 bg-green-500 rounded-lg hover:bg-green-600"
+              >
+                Tiếp tục
+              </button>
+            </div>
+          </div>
+        )}
+
+        {bookingStatus === "payment" && (
+          <>
+            {/* Payment Option Selector */}
+            <PaymentOption onPaymentOptionChange={handlePaymentOptionChange} />
+
+            <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+              <div className="space-y-6 lg:col-span-2">
+                <div className="p-6 bg-white rounded-lg shadow-sm">
+                  <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                    Thông tin thanh toán
+                  </h3>
+
+                  <div className="space-y-4">
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="text-gray-600">Giá thuê xe:</span>
+                      <span className="font-medium text-gray-800">
+                        {formatCurrency(bookingData.price.basePrice)}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="text-gray-600">Phí dịch vụ:</span>
+                      <span className="font-medium text-gray-800">
+                        {formatCurrency(bookingData.price.serviceFee)}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="text-gray-600">Bảo hiểm:</span>
+                      <span className="font-medium text-gray-800">
+                        {formatCurrency(bookingData.price.insurance)}
+                      </span>
+                    </div>
+
+                    {bookingData.price.discount > 0 && (
+                      <div className="flex justify-between py-2 border-b border-gray-200">
+                        <span className="text-gray-600">Ưu đãi:</span>
+                        <span className="font-medium text-green-600">
+                          -{formatCurrency(bookingData.price.discount)}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between py-2 border-b border-gray-200">
+                      <span className="text-gray-600">Tổng tiền:</span>
+                      <span className="font-medium text-gray-800">
+                        {formatCurrency(bookingData.price.total)}
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between py-2">
+                      <span className="font-semibold text-gray-700">
+                        Số tiền cần thanh toán:
+                      </span>
+                      <span className="font-semibold text-green-600">
+                        {paymentOption === "partial"
+                          ? `${formatCurrency(
+                              bookingData.price.depositAmount
+                            )} (40%)`
+                          : `${formatCurrency(bookingData.price.total)} (100%)`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-6 bg-white rounded-lg shadow-sm">
+                  <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                    Phương thức thanh toán
+                  </h3>
+
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <button className="flex flex-col items-center p-4 transition duration-300 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 mb-2 text-gray-700"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z"
+                        />
+                      </svg>
+                      <span className="block text-sm font-medium text-gray-700">
+                        Thẻ tín dụng
+                      </span>
+                    </button>
+
+                    <button className="flex flex-col items-center p-4 transition duration-300 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 mb-2 text-gray-700"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z"
+                        />
+                      </svg>
+                      <span className="block text-sm font-medium text-gray-700">
+                        Ngân hàng
+                      </span>
+                    </button>
+
+                    <button className="flex flex-col items-center p-4 transition duration-300 border border-gray-300 rounded-lg hover:border-green-500 hover:bg-green-50">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.5}
+                        stroke="currentColor"
+                        className="w-6 h-6 mb-2 text-gray-700"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 12a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3"
+                        />
+                      </svg>
+                      <span className="block text-sm font-medium text-gray-700">
+                        Ví điện tử
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="lg:col-span-1">
+                <div className="p-6 bg-white rounded-lg shadow-sm">
+                  <h3 className="mb-4 text-xl font-semibold text-gray-800">
+                    Thông tin xe
+                  </h3>
+
+                  <div className="mb-4 overflow-hidden bg-gray-100 rounded-lg">
+                    <img
+                      src={car.images[0]}
+                      alt={car.name}
+                      className="object-cover w-full h-auto"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Loại xe:</span>
+                      <span className="font-medium text-gray-800">
+                        {car.name}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Hộp số:</span>
+                      <span className="font-medium text-gray-800">
+                        {car.transmission}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Thời gian thuê:</span>
+                      <span className="font-medium text-gray-800">
+                        {bookingData.startDate.split(" - ")[1]} đến{" "}
+                        {bookingData.endDate.split(" - ")[1]}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Địa điểm nhận xe:</span>
+                      <span className="font-medium text-gray-800">
+                        {bookingData.pickupLocation}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Navigation Buttons */}
+                  <div className="flex justify-between mt-8">
+                    <button
+                      onClick={() => updateBookingStatus("confirm")}
+                      className="px-6 py-3 font-semibold text-white transition duration-300 bg-gray-500 rounded-lg hover:bg-gray-600"
+                    >
+                      Quay lại
+                    </button>
+                    <button
+                      onClick={() => updateBookingStatus("progress")}
+                      className="px-6 py-3 font-semibold text-white transition duration-300 bg-green-500 rounded-lg hover:bg-green-600"
+                    >
+                      Tiếp tục
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+
+        {bookingStatus === "progress" && (
+          <div className="p-8 mb-8 bg-white rounded-lg shadow-sm">
+            <h2 className="mb-6 text-2xl font-bold text-gray-800">Khởi hành</h2>
+
+            <div className="p-4 mb-6 border-l-4 border-green-400 bg-green-50">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg
+                    className="w-5 h-5 text-green-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-green-700">
+                    Thông tin đặt xe của bạn đã được xác nhận. Hãy đảm bảo bạn
+                    có mặt đúng giờ để nhận xe.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Example content for Step 4 */}
+            <div className="space-y-6">
+              <div className="p-4 border border-gray-200 rounded-lg">
+                <h3 className="mb-2 font-medium text-gray-700">
+                  Thông tin khởi hành
+                </h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-600">Ngày nhận xe:</span>
+                    <span className="font-medium text-gray-800">
+                      25/04/2025
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-600">Giờ nhận xe:</span>
+                    <span className="font-medium text-gray-800">10:00 AM</span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-600">
+                      Địa điểm nhận xe:
+                    </span>
+                    <span className="font-medium text-gray-800">
+                      123 Nguyễn Văn Linh, Quận 7, TP.HCM
+                    </span>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="text-sm text-gray-600">
+                      Người giao xe:
+                    </span>
+                    <span className="font-medium text-gray-800">
+                      Nguyễn Văn A
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 border border-gray-200 rounded-lg">
+                <h3 className="mb-2 font-medium text-gray-700">
+                  Lưu ý khi nhận xe
+                </h3>
+                <ul className="pl-5 space-y-2 text-gray-600 list-disc">
+                  <li>Mang theo CMND/CCCD và giấy phép lái xe bản gốc</li>
+                  <li>Kiểm tra kỹ xe trước khi nhận</li>
+                  <li>Chụp ảnh xe từ nhiều góc độ</li>
+                  <li>Xác nhận với chủ xe về tình trạng xe</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex justify-between mt-8">
+              <button
+                onClick={() => updateBookingStatus("payment")}
+                className="px-6 py-3 font-semibold text-white transition duration-300 bg-gray-500 rounded-lg hover:bg-gray-600"
+              >
+                Quay lại
+              </button>
+              <button
+                onClick={() => updateBookingStatus("complete")}
+                className="px-6 py-3 font-semibold text-white transition duration-300 bg-green-500 rounded-lg hover:bg-green-600"
+              >
+                Tiếp tục
+              </button>
+            </div>
+          </div>
+        )}
+
+        {bookingStatus === "complete" && (
+          <div className="space-y-8">
+            <div className="p-8 mb-8 bg-white rounded-lg shadow-sm">
+              <div className="mb-8 text-center">
+                <div className="inline-flex items-center justify-center w-24 h-24 mb-5 bg-green-100 rounded-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={2}
+                    stroke="currentColor"
+                    className="w-12 h-12 text-green-600"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                    />
+                  </svg>
+                </div>
+                <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                  Kết thúc chuyến đi thành công!
+                </h2>
+                <p className="text-gray-600">
+                  Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.
+                </p>
+              </div>
+
+              {/* Example content for Step 5 */}
+              <div className="space-y-6">
+                <div className="p-6 border border-gray-200 rounded-lg bg-gray-50">
+                  <h3 className="mb-4 font-medium text-gray-700">
+                    Thông tin chuyến đi
+                  </h3>
+
+                  <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-600">
+                        Tổng thời gian thuê:
+                      </span>
+                      <span className="font-medium text-gray-800">3 ngày</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-600">
+                        Tổng quãng đường:
+                      </span>
+                      <span className="font-medium text-gray-800">350 km</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-600">
+                        Ngày trả xe:
+                      </span>
+                      <span className="font-medium text-gray-800">
+                        28/04/2025
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-gray-600">Giờ trả xe:</span>
+                      <span className="font-medium text-gray-800">
+                        10:00 AM
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-200">
+                    <h4 className="mb-2 font-medium text-gray-700">
+                      Chi phí chuyến đi
+                    </h4>
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Tiền thuê xe:</span>
+                        <span className="font-medium text-gray-800">
+                          3,600,000 VND
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Phí dịch vụ:</span>
+                        <span className="font-medium text-gray-800">
+                          360,000 VND
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Phí phát sinh:</span>
+                        <span className="font-medium text-gray-800">0 VND</span>
+                      </div>
+                      <div className="flex justify-between pt-2 mt-2 border-t border-gray-200">
+                        <span className="font-semibold text-gray-800">
+                          Tổng cộng:
+                        </span>
+                        <span className="font-semibold text-green-600">
+                          3,960,000 VND
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <button
+                    onClick={() => updateBookingStatus("progress")}
+                    className="px-6 py-3 font-semibold text-white transition duration-300 bg-gray-500 rounded-lg hover:bg-gray-600"
+                  >
+                    Quay lại
+                  </button>
+                  <button
+                    onClick={() => updateBookingStatus("pending")}
+                    className="px-6 py-3 font-semibold text-white transition duration-300 bg-green-500 rounded-lg hover:bg-green-600"
+                  >
+                    Quay về trang chủ
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Car Ratings Summary */}
+            <div className="p-6 mb-4 bg-white rounded-lg shadow-sm">
+              <div className="flex items-center mb-4">
+                <div className="flex-1">
+                  <h3 className="text-lg font-medium text-gray-800">
+                    Đánh giá về xe
+                  </h3>
+                  <div className="flex items-center mt-1">
+                    <div className="flex">
+                      {Array.from({ length: 5 }).map((_, index) => (
+                        <svg
+                          key={index}
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 24 24"
+                          fill="currentColor"
+                          className={`w-5 h-5 ${
+                            index < Math.floor(averageRating)
+                              ? "text-yellow-400"
+                              : index === Math.floor(averageRating) &&
+                                averageRating % 1 > 0
+                              ? "text-yellow-300"
+                              : "text-gray-300"
+                          }`}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      ))}
+                    </div>
+                    <span className="ml-2 text-lg font-medium text-gray-800">
+                      {averageRating}/5
+                    </span>
+                    <span className="ml-2 text-sm text-gray-500">
+                      ({reviewList.length} đánh giá)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="w-20 h-20 overflow-hidden bg-gray-100 rounded-lg">
+                  <img
+                    src={car.images[0]}
+                    alt={car.name}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2 mb-4">
+                <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                  Sạch sẽ
+                </span>
+                <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                  Đúng giờ
+                </span>
+                <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                  Xe mới
+                </span>
+                <span className="px-3 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full">
+                  Chủ xe thân thiện
+                </span>
+              </div>
+            </div>
+
+            {/* Reviews Form and List */}
+            <Reviews />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
