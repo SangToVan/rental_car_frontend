@@ -6,8 +6,8 @@ import Features from "../components/common/Features";
 import Reviews from "../components/common/Reviews";
 import Button from "../components/ui/Button";
 import CarCard from "../components/cars/CarCard";
-import BookingDetailModal from "../components/modals/ConfirmModal/BookingDetailModal";
-import BookingConfirmModal from "../components/modals/ConfirmModal/BookingConfirmModal";
+import BookingDetailModal from "../components/modals/BookingModal/BookingDetailModal";
+import BookingConfirmModal from "../components/modals/BookingModal/BookingConfirmModal";
 
 export default function CarDetail() {
   const { id } = useParams();

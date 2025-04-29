@@ -1,4 +1,6 @@
-export default function RentalPeriod() {
+export default function RentalPeriod({ booking = {} }) {
+  const isTomorrow = true;
+
   return (
     <div className="p-6 overflow-hidden bg-white rounded-lg shadow-sm">
       <h3 className="mb-4 text-lg font-medium text-gray-800">
@@ -26,9 +28,11 @@ export default function RentalPeriod() {
           </div>
           <div className="ml-7">
             <p className="text-lg font-semibold text-gray-800">
-              21:00 - 24/04/2025
+              {booking.startDate}
             </p>
-            <span className="mt-1 text-xs text-blue-600">Ngày mai</span>
+            {isTomorrow && (
+              <span className="mt-1 text-xs text-blue-600">Ngày mai</span>
+            )}
           </div>
         </div>
 
@@ -54,7 +58,7 @@ export default function RentalPeriod() {
           </div>
           <div className="ml-7">
             <p className="text-lg font-semibold text-gray-800">
-              20:00 - 25/04/2025
+              {booking.endDate}
             </p>
           </div>
         </div>

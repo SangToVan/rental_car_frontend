@@ -1,4 +1,4 @@
-export default function OwnerInformation({ owner }) {
+export default function OwnerInformation({ owner = {} }) {
   return (
     <div className="p-6 overflow-hidden bg-white rounded-lg shadow-sm">
       <div className="p-6 mb-6 border border-gray-200 rounded-lg">

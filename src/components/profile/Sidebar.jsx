@@ -1,4 +1,5 @@
 import {
+  FiCreditCard,
   FiGift,
   FiHeart,
   FiLock,
@@ -77,7 +78,7 @@ export default function Sidebar() {
               </NavLink>
 
               <NavLink
-                to="/user/rental-orders"
+                to="/user/wallet"
                 className={({ isActive }) =>
                   `flex items-center space-x-3 rounded-lg px-4 py-3 ${
                     isActive
@@ -86,36 +87,8 @@ export default function Sidebar() {
                   }`
                 }
               >
-                <FiPackage className="w-5 h-5" />
-                <span>Đơn hàng Thuê xe dài hạn</span>
-              </NavLink>
-
-              <NavLink
-                to="/user/gifts"
-                className={({ isActive }) =>
-                  `flex items-center space-x-3 rounded-lg px-4 py-3 ${
-                    isActive
-                      ? "border-l-4 border-green-500 bg-gray-100 text-green-600"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`
-                }
-              >
-                <FiGift className="w-5 h-5" />
-                <span>Quà tặng</span>
-              </NavLink>
-
-              <NavLink
-                to="/user/address"
-                className={({ isActive }) =>
-                  `flex items-center space-x-3 rounded-lg px-4 py-3 ${
-                    isActive
-                      ? "border-l-4 border-green-500 bg-gray-100 text-green-600"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`
-                }
-              >
-                <FiMapPin className="w-5 h-5" />
-                <span>Địa chỉ của tôi</span>
+                <FiCreditCard className="w-5 h-5" />
+                <span>Ví của tôi</span>
               </NavLink>
 
               <NavLink

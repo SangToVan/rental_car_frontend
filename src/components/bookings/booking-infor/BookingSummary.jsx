@@ -1,5 +1,10 @@
-export default function BookingSummary({ status }) {
-  const isPending = status === "pending";
+export default function BookingSummary({ booking = {} }) {
+  const isPending = booking.status === "pending";
+
+  // Utility function to format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("vi-VN").format(amount);
+  };
 
   return (
     <div className="p-6 overflow-hidden bg-white rounded-lg shadow-sm">
@@ -24,7 +29,9 @@ export default function BookingSummary({ status }) {
               />
             </svg>
           </div>
-          <span className="font-medium text-gray-800">610.000 /ngày</span>
+          <span className="font-medium text-gray-800">
+            {formatCurrency(booking.price.basePrice)} /ngày
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
@@ -45,7 +52,9 @@ export default function BookingSummary({ status }) {
               />
             </svg>
           </div>
-          <span className="font-medium text-gray-800">90.280 /ngày</span>
+          <span className="font-medium text-gray-800">
+            {formatCurrency(booking.price.serviceFee)} /ngày
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
@@ -66,14 +75,23 @@ export default function BookingSummary({ status }) {
               />
             </svg>
           </div>
-          <span className="font-medium text-gray-800">62.831 /ngày</span>
+          <span className="font-medium text-gray-800">
+            {formatCurrency(booking.price.insurance)} /ngày
+          </span>
         </div>
       </div>
 
       <div className="pt-4 mt-4 border-t border-gray-200">
         <div className="flex items-center justify-between font-medium">
           <span className="text-gray-600">Tổng cộng</span>
-          <span className="text-lg text-gray-800">763.111 x 1 ngày</span>
+          <span className="text-lg text-gray-800">
+            {formatCurrency(
+              booking.price.basePrice +
+                booking.price.serviceFee +
+                booking.price.insurance
+            )}{" "}
+            x 1 ngày
+          </span>
         </div>
       </div>
 
@@ -97,14 +115,18 @@ export default function BookingSummary({ status }) {
         </div>
         <div className="flex items-center justify-between mt-2 text-sm">
           <span className="text-gray-600">Giảm giá</span>
-          <span className="font-medium text-red-600">-100.000</span>
+          <span className="font-medium text-red-600">
+            -{formatCurrency(booking.price.discount)}
+          </span>
         </div>
       </div>
 
       <div className="pt-4 mt-4 border-t border-gray-200">
         <div className="flex items-center justify-between font-medium">
           <span className="text-gray-700">Thành tiền</span>
-          <span className="text-xl text-gray-800">663.111đ</span>
+          <span className="text-xl text-gray-800">
+            {formatCurrency(booking.price.total)}đ
+          </span>
         </div>
       </div>
 
@@ -127,7 +149,9 @@ export default function BookingSummary({ status }) {
               />
             </svg>
           </div>
-          <span className="font-medium text-green-600">265.111đ</span>
+          <span className="font-medium text-green-600">
+            {formatCurrency(booking.price.depositAmount)}đ
+          </span>
         </div>
 
         <div className="flex items-center justify-between">
@@ -148,7 +172,9 @@ export default function BookingSummary({ status }) {
               />
             </svg>
           </div>
-          <span className="font-medium text-gray-800">398.000đ</span>
+          <span className="font-medium text-gray-800">
+            {formatCurrency(booking.price.remainingAmount)}đ
+          </span>
         </div>
       </div>
 
@@ -156,7 +182,9 @@ export default function BookingSummary({ status }) {
         <h4 className="mb-2 text-base font-medium text-gray-800">
           Lời nhắn riêng
         </h4>
-        <p className="text-sm text-gray-600">Không có lời nhắn</p>
+        <p className="text-sm text-gray-600">
+          {booking.requirementMessage || "Không có lời nhắn"}
+        </p>
       </div>
 
       <div className="mt-6">

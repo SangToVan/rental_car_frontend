@@ -1,8 +1,6 @@
 import { useState } from "react";
-import { useBooking } from "../../context/BookingContext";
 
-export default function Reviews() {
-  const { addReview, reviewList } = useBooking();
+export default function Reviews({ reviewList, addReview }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [reviewText, setReviewText] = useState("");

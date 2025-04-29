@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
-import { useBooking } from "../../context/BookingContext";
 
 export default function RentalDocuments() {
-  const {
-    selectedDocumentOption,
-    updateSelectedDocumentOption,
-    driverInfo,
-    updateDriverInfo,
-  } = useBooking();
+  // Replace context with local state
+  const [selectedDocumentOption, setSelectedDocumentOption] =
+    useState("option1");
+  const [driverInfo, setDriverInfo] = useState({
+    name: "",
+    phone: "",
+    idNumber: "",
+    relationship: "family",
+  });
 
   const [showDriverForm, setShowDriverForm] = useState(false);
 
@@ -43,12 +45,12 @@ export default function RentalDocuments() {
   }, [selectedDocumentOption]);
 
   const handleOptionChange = (optionId) => {
-    updateSelectedDocumentOption(optionId);
+    setSelectedDocumentOption(optionId);
   };
 
   const handleDriverInfoChange = (e) => {
     const { name, value } = e.target;
-    updateDriverInfo({ [name]: value });
+    setDriverInfo({ ...driverInfo, [name]: value });
   };
 
   return (

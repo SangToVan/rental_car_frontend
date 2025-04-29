@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ProgressSteps from "../components/bookings/ProgressSteps";
 import BookingNotice from "../components/bookings/common/BookingNotice";
 import CarInformation from "../components/bookings/booking-infor/CarInformation";
@@ -12,24 +12,90 @@ import CancellationPolicy from "../components/bookings/common/CancellationPolicy
 import PaymentOption from "../components/bookings/payment/PaymentOption";
 import Reviews from "../components/bookings/reviews/Reviews";
 import { mockBookings } from "../utils/mockData";
-import { useBooking } from "../components/context/BookingContext";
 
 export default function BookingDetail() {
-  // Use global state from context
-  const {
-    bookingStatus,
-    currentStep,
-    bookingData,
-    updateBookingStatus,
-    averageRating,
-    reviewList,
-  } = useBooking();
+  // Local state replacing context
+  const [bookingStatus, setBookingStatus] = useState("pending");
+  const [currentStep, setCurrentStep] = useState(1);
+  const [bookingData, setBookingData] = useState(mockBookings[0]);
 
   // Local UI state
   const [paymentOption, setPaymentOption] = useState("partial");
   const [showCancelled, setShowCancelled] = useState(false);
 
-  const car = bookingData.car;
+  // Initial reviews
+  const initialReviews = [
+    {
+      id: "r1",
+      name: "Nguyễn Văn A",
+      rating: 5,
+      comment:
+        "Dịch vụ rất tốt, xe sạch sẽ và chủ xe nhiệt tình. Sẽ thuê lại lần sau!",
+      date: "26/04/2025",
+      avatarUrl: "https://ext.same-assets.com/1283309287/1369451906.svg",
+    },
+    {
+      id: "r2",
+      name: "Trần Thị B",
+      rating: 4,
+      comment:
+        "Xe chạy êm, tốt. Chỉ hơi muộn giờ một chút khi giao xe nhưng nhìn chung vẫn hài lòng.",
+      date: "24/04/2025",
+      avatarUrl: "https://ext.same-assets.com/1283309287/3335277324.svg",
+    },
+  ];
+
+  const [reviewList, setReviewList] = useState(initialReviews);
+  const [averageRating, setAverageRating] = useState(
+    calculateAverageRating(initialReviews)
+  );
+
+  // Calculate average rating
+  function calculateAverageRating(reviews) {
+    if (reviews.length === 0) return 0;
+    const sum = reviews.reduce((total, review) => total + review.rating, 0);
+    return (sum / reviews.length).toFixed(1);
+  }
+
+  // Update currentStep based on bookingStatus
+  useEffect(() => {
+    switch (bookingStatus) {
+      case "pending":
+        setCurrentStep(1);
+        break;
+      case "confirm":
+        setCurrentStep(2);
+        break;
+      case "payment":
+        setCurrentStep(3);
+        break;
+      case "progress":
+        setCurrentStep(4);
+        break;
+      case "complete":
+        setCurrentStep(5);
+        break;
+      default:
+        setCurrentStep(1);
+    }
+  }, [bookingStatus]);
+
+  // Function to update booking data
+  const updateBookingData = (newData) => {
+    setBookingData({
+      ...bookingData,
+      ...newData,
+    });
+  };
+
+  // Function to add a new review
+  const addReview = (newReview) => {
+    const updatedReviews = [newReview, ...reviewList];
+    setReviewList(updatedReviews);
+    setAverageRating(calculateAverageRating(updatedReviews));
+  };
+
+  const car = mockBookings[1].car;
 
   // Utility function to format currency
   const formatCurrency = (amount) => {
@@ -44,6 +110,11 @@ export default function BookingDetail() {
   // Toggle cancelled notification (for demo purposes)
   const toggleNotification = () => {
     setShowCancelled(!showCancelled);
+  };
+
+  // Function to update the booking status
+  const updateBookingStatus = (newStatus) => {
+    setBookingStatus(newStatus);
   };
 
   return (
@@ -61,8 +132,8 @@ export default function BookingDetail() {
                 notificationText="Thời gian thanh toán giữ chỗ còn lại 1 giờ 36 phút"
               />
 
-              <CarInformation booking={mockBookings[0]} />
-              <RentalPeriod />
+              <CarInformation car={car} />
+              <RentalPeriod booking={mockBookings[1]} />
               <RentalDocuments />
               <RentalAccessories />
               <RentalTerms />
@@ -80,8 +151,8 @@ export default function BookingDetail() {
             </div>
 
             <div className="space-y-8 lg:col-span-1">
-              <OwnerInformation owner={mockBookings[0].car.owner} />
-              <BookingSummary status={bookingStatus} />
+              <OwnerInformation owner={car.owner} />
+              <BookingSummary booking={mockBookings[1]} />
             </div>
           </div>
         )}
@@ -124,15 +195,13 @@ export default function BookingDetail() {
                 <div className="flex flex-col gap-4 md:flex-row">
                   <div className="w-full md:w-1/3">
                     <img
-                      src={mockBookings[1].car.images[0]}
-                      alt={mockBookings[1].car.name}
+                      src={car.images[0]}
+                      alt={car.name}
                       className="object-cover w-full h-auto rounded-lg"
                     />
                   </div>
                   <div className="w-full md:w-2/3">
-                    <p className="text-lg font-semibold">
-                      {mockBookings[1].car.name}
-                    </p>
+                    <p className="text-lg font-semibold">{car.name}</p>
                     <div className="grid grid-cols-1 gap-2 mt-2 md:grid-cols-2">
                       <div>
                         <p className="text-gray-600">Thời gian thuê:</p>
@@ -658,7 +727,11 @@ export default function BookingDetail() {
             </div>
 
             {/* Reviews Form and List */}
-            <Reviews />
+            <Reviews
+              reviewList={reviewList}
+              averageRating={averageRating}
+              addReview={addReview}
+            />
           </div>
         )}
       </div>
