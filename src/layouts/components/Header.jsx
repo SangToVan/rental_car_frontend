@@ -5,19 +5,21 @@ import SignupModal from "../../components/modals/AuthModal/SignupModal";
 import NoticeDropdown from "../../components/home/Notifications/NoticeDropdown";
 import { useState } from "react";
 import { mockNotice } from "/src/utils/mockData.js";
+import { useSelector } from "react-redux";
 
-export default function Header({ isLoggedIn, setIsLoggedIn }) {
+export default function Header() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showSignupModal, setShowSignupModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
 
+  const { isAuthenticated, user } = useSelector((state) => state.auth);
+
   const handleLogin = () => {
-    setIsLoggedIn(true);
     setShowLoginModal(false);
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
+  const handleSignUp = () => {
+    setShowSignupModal(false);
   };
 
   return (
@@ -36,12 +38,12 @@ export default function Header({ isLoggedIn, setIsLoggedIn }) {
                 Về chúng tôi
               </Link>
               <Link
-                to="/add-car/step1"
+                to="/add-car"
                 className="font-medium text-mioto-dark hover:text-primary"
               >
                 Trở thành chủ xe
               </Link>
-              {isLoggedIn && (
+              {isAuthenticated && (
                 <Link
                   to="/booking"
                   className="font-medium text-mioto-dark hover:text-primary"
@@ -52,7 +54,7 @@ export default function Header({ isLoggedIn, setIsLoggedIn }) {
             </div>
             {/* User Actions */}
             <div className="flex items-center gap-5 pl-4 border-l border-gray-200">
-              {isLoggedIn ? (
+              {isAuthenticated ? (
                 <>
                   {/* Notification Bell */}
                   <div className="relative">
@@ -87,13 +89,19 @@ export default function Header({ isLoggedIn, setIsLoggedIn }) {
                   {/* User Profile */}
                   <Link to="/user/profile">
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center justify-center w-10 h-10 font-bold text-white bg-blue-500 rounded-full">
-                        S
-                      </div>
+                      <img
+                        src={
+                          user?.avatar ||
+                          "https://ui-avatars.com/api/?name=" +
+                            (user?.username || "User")
+                        }
+                        alt="User avatar"
+                        className="object-cover w-10 h-10 border border-gray-200 rounded-full"
+                      />
                       <div className="relative group">
                         <div className="flex items-center gap-1 cursor-pointer">
                           <span className="text-sm font-medium">
-                            Sinh viên tìm tài liệu
+                            {user?.username}
                           </span>
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -148,6 +156,7 @@ export default function Header({ isLoggedIn, setIsLoggedIn }) {
           {showSignupModal && (
             <SignupModal
               onClose={() => setShowSignupModal(false)}
+              onSignup={handleSignUp}
               onSwitchToLogin={() => {
                 setShowSignupModal(false);
                 setShowLoginModal(true);

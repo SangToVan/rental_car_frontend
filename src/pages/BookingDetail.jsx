@@ -12,13 +12,51 @@ import CancellationPolicy from "../components/bookings/common/CancellationPolicy
 import PaymentOption from "../components/bookings/payment/PaymentOption";
 import Reviews from "../components/bookings/reviews/Reviews";
 import { mockBookings } from "../utils/mockData";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import RequestError from "../pages/error/RequestError";
+import { addBookingApi } from "../shared/apis/bookingApi";
 
 export default function BookingDetail() {
-  // Local state replacing context
-  const [bookingStatus, setBookingStatus] = useState("pending");
-  const [currentStep, setCurrentStep] = useState(1);
-  const [bookingData, setBookingData] = useState(mockBookings[0]);
+  const [bookingDetails, setBookingDetails] = useState(null);
+  const [carInfor, setCarInfor] = useState(null);
+  const [renterInfor, setRenterInfor] = useState(null);
+  const [rentalDays, setRentalDays] = useState(1);
+  const [startDate, setStartDate] = useState("04/04/2025 21:00");
+  const [endDate, setEndDate] = useState("05/04/2025 20:00");
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [showConfirmDepositModal, setShowConfirmDepositModal] = useState(false);
+  // const [showConfirmPaymentModal, setShowConfirmPaymentModal] = useState(false)
+  const params = useParams();
+  const { bookingId } = params;
 
+  useEffect(() => {
+    getBookingDetailsApi(bookingId).then((data) => {
+      const { carDetail, customerInfo } = data.data;
+      setBookingDetails(data.data);
+      setCarInfor(carDetail);
+      setRenterInfor(customerInfo);
+      setStartDate(data.data.startDateTime);
+      setEndDate(data.data.endDateTime);
+    });
+  }, [id]);
+
+  useEffect(() => {
+    if (startDate && endDate && carInfor) {
+      const days = calculateRentalDays(startDate, endDate);
+      const total = calculateTotalRentalCost(carInfor?.basePrice, days);
+      setRentalDays(days);
+      setTotalPrice(total);
+    }
+  }, [startDate, endDate, carInfor]);
+
+  const handleConfirmDeposit = async () => {
+    const { message } = await confirmDepositApi(bookingId);
+    toast.success(message);
+  };
+
+  // Local state
+  const [bookingStatus, setBookingStatus] = useState(bookingDetails?.status);
+  const [currentStep, setCurrentStep] = useState(2);
   // Local UI state
   const [paymentOption, setPaymentOption] = useState("partial");
   const [showCancelled, setShowCancelled] = useState(false);
@@ -80,22 +118,12 @@ export default function BookingDetail() {
     }
   }, [bookingStatus]);
 
-  // Function to update booking data
-  const updateBookingData = (newData) => {
-    setBookingData({
-      ...bookingData,
-      ...newData,
-    });
-  };
-
   // Function to add a new review
   const addReview = (newReview) => {
     const updatedReviews = [newReview, ...reviewList];
     setReviewList(updatedReviews);
     setAverageRating(calculateAverageRating(updatedReviews));
   };
-
-  const car = mockBookings[1].car;
 
   // Utility function to format currency
   const formatCurrency = (amount) => {
@@ -123,7 +151,7 @@ export default function BookingDetail() {
         <ProgressSteps currentStep={currentStep} />
 
         {/* Render different content based on booking status */}
-        {bookingStatus === "pending" && (
+        {currentStep == 1 || currentStep == 2 && (
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="space-y-8 lg:col-span-2">
               <BookingNotice
@@ -157,7 +185,7 @@ export default function BookingDetail() {
           </div>
         )}
 
-        {bookingStatus === "confirm" && (
+        {currentStep === 2 && (
           <div className="p-8 mb-8 bg-white rounded-lg shadow-sm">
             <h2 className="mb-6 text-2xl font-bold text-gray-800">
               Duyệt yêu cầu
@@ -253,7 +281,7 @@ export default function BookingDetail() {
           </div>
         )}
 
-        {bookingStatus === "payment" && (
+        {currentStep === 3 && (
           <>
             {/* Payment Option Selector */}
             <PaymentOption onPaymentOptionChange={handlePaymentOptionChange} />
@@ -450,7 +478,7 @@ export default function BookingDetail() {
           </>
         )}
 
-        {bookingStatus === "progress" && (
+        {currentStep === 4 && (
           <div className="p-8 mb-8 bg-white rounded-lg shadow-sm">
             <h2 className="mb-6 text-2xl font-bold text-gray-800">Khởi hành</h2>
 
@@ -546,7 +574,7 @@ export default function BookingDetail() {
           </div>
         )}
 
-        {bookingStatus === "complete" && (
+        {currentStep === 5 && (
           <div className="space-y-8">
             <div className="p-8 mb-8 bg-white rounded-lg shadow-sm">
               <div className="mb-8 text-center">

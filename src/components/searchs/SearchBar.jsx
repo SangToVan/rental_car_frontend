@@ -1,26 +1,161 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
-  FaBuilding,
+  FaMapMarkerAlt,
   FaCalendarAlt,
-  FaCarSide,
+  FaMapMarkedAlt,
   FaChevronLeft,
+  FaSync,
+  FaCarSide,
+  FaBuilding,
+  FaUser,
   FaClock,
   FaFileInvoiceDollar,
   FaImage,
-  FaMapMarkedAlt,
-  FaMapMarkerAlt,
-  FaSync,
-  FaUser,
 } from "react-icons/fa";
-import LocationModal from "./modals/LocationModal";
+import Select from "react-select";
+import { vietnamLocations } from "../../shared/locations";
 import TimeModal from "./modals/TimeModal";
+import { useDispatch, useSelector } from "react-redux";
+import { setSearchInfor } from "../../shared/toolkits/searchSlice";
+import { Controller, useForm } from "react-hook-form";
+import {
+  checkReturnDateTime,
+  convertToLocalDateTime,
+} from "../../shared/utils";
 
-export default function SearchBar() {
-  const [showLocationModal, setShowLocationModal] = useState(false);
+export default function SearchBar({ onSubmit }) {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setError,
+    setValue,
+    control,
+    formState: { errors },
+  } = useForm();
+
+  const searchInfor = useSelector((state) => state.search);
+  const dispatch = useDispatch();
+
+  const [location, setLocation] = useState(null);
+  const [pickupDateTime, setPickupDateTime] = useState(null);
+  const [returnDateTime, setReturnDateTime] = useState(null);
   const [showTimeModal, setShowTimeModal] = useState(false);
 
+  useEffect(() => {
+    reset(searchInfor);
+  }, [searchInfor, reset]);
+
+  useEffect(() => {
+    if (pickupDateTime && returnDateTime) {
+      const sD = pickupDateTime.toISOString().split("T")[0];
+      const sT = pickupDateTime.toTimeString().slice(0, 5);
+      const eD = returnDateTime.toISOString().split("T")[0];
+      const eT = returnDateTime.toTimeString().slice(0, 5);
+
+      setValue("sD", sD);
+      setValue("sT", sT);
+      setValue("eD", eD);
+      setValue("eT", eT);
+    }
+  }, [pickupDateTime, returnDateTime, setValue]);
+
+  const handleTimeSelection = ({
+    pickupDateTime,
+    returnDateTime,
+    sD,
+    sT,
+    eD,
+    eT,
+  }) => {
+    setPickupDateTime(pickupDateTime);
+    setReturnDateTime(returnDateTime);
+
+    // Cập nhật vào react-hook-form
+    setValue("sD", sD);
+    setValue("sT", sT);
+    setValue("eD", eD);
+    setValue("eT", eT);
+
+    setShowTimeModal(false);
+  };
+
+  const onHandleSubmit = (data) => {
+    const { sD, sT, eD, eT } = data;
+
+    if (convertToLocalDateTime(sD, sT) < new Date()) {
+      setError("sD", {
+        type: "custom",
+        message: "Ngày lấy xe phải muộn hơn bây giờ!",
+      });
+      return;
+    }
+
+    if (!checkReturnDateTime(sD, sT, eD, eT)) {
+      setError("eD", {
+        type: "custom",
+        message: "Ngày trả xe phải muộn hơn ngày lấy xe!",
+      });
+      return;
+    }
+
+    dispatch(setSearchInfor(data));
+    if (onSubmit) onSubmit(data);
+  };
+
+  const timeRangeDisplay =
+    pickupDateTime && returnDateTime
+      ? `${pickupDateTime.toLocaleString()} → ${returnDateTime.toLocaleString()}`
+      : null;
+
   return (
-    <div className="bg-white shadow-sm">
+    // <form onSubmit={handleSubmit(onHandleSubmit)}>
+    //   <div className="p-4 bg-white shadow-sm">
+    //     <div className="flex flex-wrap items-center gap-4">
+    //       <div className="flex items-center w-72">
+    //         <FaMapMarkerAlt className="mr-2 text-gray-600" />
+    //         <Select
+    //           value={location}
+    //           onChange={handleLocationChange}
+    //           options={vietnamLocations}
+    //           placeholder="Chọn địa điểm"
+    //           classNamePrefix="react-select"
+    //           className="flex-1"
+    //           isSearchable
+    //         />
+    //         <input
+    //           type="hidden"
+    //           {...register("location", { required: "Vui lòng chọn địa điểm!" })}
+    //         />
+    //       </div>
+
+    //       <div
+    //         className="flex items-center text-gray-800 cursor-pointer"
+    //         onClick={() => setShowTimeModal(true)}
+    //       >
+    //         <FaCalendarAlt className="mr-2 text-gray-600" />
+    //         <span>{timeRangeDisplay || "Chọn thời gian thuê"}</span>
+    //       </div>
+    //     </div>
+
+    //     <input type="hidden" {...register("sD")} />
+    //     <input type="hidden" {...register("sT")} />
+    //     <input type="hidden" {...register("eD")} />
+    //     <input type="hidden" {...register("eT")} />
+
+    //     {showTimeModal && (
+    //       <TimeModal
+    //         onClose={() => setShowTimeModal(false)}
+    //         onSelectTime={handleTimeSelection}
+    //       />
+    //     )}
+    //   </div>
+    // </form>
+
+    <form
+      onSubmit={handleSubmit(onHandleSubmit)}
+      className="bg-white shadow-sm"
+    >
       <div className="container px-4 mx-auto">
         {/* Top search bar */}
         <div className="flex items-center py-3">
@@ -28,12 +163,35 @@ export default function SearchBar() {
             <FaChevronLeft />
           </button>
 
-          <div
-            className="flex items-center ml-2 text-gray-800 cursor-pointer"
-            onClick={() => setShowLocationModal(true)}
-          >
+          <div className="flex items-center ml-2 text-gray-800 cursor-pointer">
             <FaMapMarkerAlt className="mr-2 text-gray-600" />
-            <span>TP. Hồ Chí Minh</span>
+            <Controller
+              name="location"
+              control={control}
+              defaultValue={location}
+              rules={{ required: "Hãy cung cấp địa điểm lấy xe!" }}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  options={vietnamLocations}
+                  placeholder="Chọn địa điểm"
+                  classNamePrefix="react-select"
+                  className="w-64"
+                  isSearchable
+                  value={vietnamLocations.find(
+                    (option) => option.value === field.value
+                  )}
+                  onChange={(selectedOption) => {
+                    field.onChange(selectedOption.value);
+                  }}
+                />
+              )}
+            />
+            {errors.location && (
+              <p className="mt-1 text-sm text-red-500">
+                {errors.location.message}
+              </p>
+            )}
           </div>
 
           <div
@@ -41,9 +199,18 @@ export default function SearchBar() {
             onClick={() => setShowTimeModal(true)}
           >
             <FaCalendarAlt className="mr-2 text-gray-600" />
-            <span>21:00, 20/04/2025 - 20:00, 21/04/2025</span>
+            <span>
+              {pickupDateTime && returnDateTime
+                ? `${pickupDateTime.toLocaleString()} → ${returnDateTime.toLocaleString()}`
+                : "Chọn thời gian nhận và trả xe"}
+            </span>
           </div>
         </div>
+
+        <input type="hidden" {...register("sD")} />
+        <input type="hidden" {...register("sT")} />
+        <input type="hidden" {...register("eD")} />
+        <input type="hidden" {...register("eT")} />
 
         {/* Filter options */}
         <div className="flex flex-wrap items-center py-3 border-t border-gray-200">
@@ -105,12 +272,12 @@ export default function SearchBar() {
         </div>
       </div>
 
-      {/* Modals */}
-      {showLocationModal && (
-        <LocationModal onClose={() => setShowLocationModal(false)} />
+      {showTimeModal && (
+        <TimeModal
+          onClose={() => setShowTimeModal(false)}
+          onSelectTime={handleTimeSelection}
+        />
       )}
-
-      {showTimeModal && <TimeModal onClose={() => setShowTimeModal(false)} />}
-    </div>
+    </form>
   );
 }

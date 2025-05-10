@@ -65,7 +65,7 @@ export const mockNotice = [
 
 export const mockCars = [
   {
-    id: "KE7XZ6",
+    id: "1",
     name: "FORD ECOSPORT 2019",
     images: [imgFront, imgBack, imgLeft, imgRight],
     type: "Số tự động",
@@ -235,8 +235,8 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 42,
-    price: 415000,
-    hourlyPrice: 309000,
+    price: 415,
+    hourlyPrice: 309,
     discount: 19,
   },
   {
@@ -248,8 +248,8 @@ export const mockCarData = [
     location: "Quận 3, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 38,
-    price: 599000,
-    hourlyPrice: 439000,
+    price: 599,
+    hourlyPrice: 439,
   },
   {
     id: 3,
@@ -260,8 +260,8 @@ export const mockCarData = [
     location: "Quận 5, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 29,
-    price: 635000,
-    hourlyPrice: 441000,
+    price: 635,
+    hourlyPrice: 441,
     deliveryOption: true,
   },
   {
@@ -273,8 +273,8 @@ export const mockCarData = [
     location: "Quận 4, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 100,
-    price: 730000,
-    originalPrice: 850000,
+    price: 730,
+    originalPrice: 850,
     discount: 16,
   },
   {
@@ -286,7 +286,7 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 34,
-    price: 726000,
+    price: 726,
     discount: 12,
   },
   {
@@ -298,7 +298,7 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 64,
-    price: 1180000,
+    price: 1180,
     discount: 13,
   },
   {
@@ -310,7 +310,7 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 23,
-    price: 1118000,
+    price: 1118,
     discount: 10,
   },
   {
@@ -322,7 +322,7 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 4.9,
     trips: 110,
-    price: 1456000,
+    price: 1456,
     discount: 6,
   },
   {
@@ -334,8 +334,8 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 42,
-    price: 415000,
-    hourlyPrice: 309000,
+    price: 415,
+    hourlyPrice: 309,
     discount: 19,
   },
   {
@@ -347,8 +347,8 @@ export const mockCarData = [
     location: "Quận 3, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 38,
-    price: 599000,
-    hourlyPrice: 439000,
+    price: 599,
+    hourlyPrice: 439,
   },
   {
     id: 11,
@@ -359,8 +359,8 @@ export const mockCarData = [
     location: "Quận 5, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 29,
-    price: 635000,
-    hourlyPrice: 441000,
+    price: 635,
+    hourlyPrice: 441,
     deliveryOption: true,
   },
   {
@@ -372,8 +372,8 @@ export const mockCarData = [
     location: "Quận 4, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 100,
-    price: 730000,
-    originalPrice: 850000,
+    price: 730,
+    originalPrice: 850,
     discount: 16,
   },
   {
@@ -385,7 +385,7 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 34,
-    price: 726000,
+    price: 726,
     discount: 12,
   },
   {
@@ -397,7 +397,7 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 64,
-    price: 1180000,
+    price: 1180,
     discount: 13,
   },
   {
@@ -409,7 +409,7 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 5.0,
     trips: 23,
-    price: 1118000,
+    price: 1118,
     discount: 10,
   },
   {
@@ -421,7 +421,7 @@ export const mockCarData = [
     location: "Quận 1, TP. Hồ Chí Minh",
     rating: 4.9,
     trips: 110,
-    price: 1456000,
+    price: 1456,
     discount: 6,
   },
 ];

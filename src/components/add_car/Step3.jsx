@@ -1,69 +1,50 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ImagesUpload from "../cars/ImagesUpload"; // new component
+import { addCarApi } from "../../shared/apis/carApi"; // make sure the path is correct
+import SuccessModal from "../modals/SuccessModal/SuccessModal";
 
-export default function Step3() {
-  const [selectedImages, setSelectedImages] = useState({
-    sideImage: true,
-    backImage: true,
-  });
+export default function Step3({ newCar = {}, setNewCar, nextStep, onCancel }) {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [images, setImages] = useState(
+    new Array(4).fill({ id: null, imageItem: null })
+  );
+
+  const [showSuccess, setShowSuccess] = useState(false);
+
+
+  const handleSubmit = async (event) => {
+    event?.preventDefault();
+
+    const validImages = images.filter((img) => !!img.imageItem);
+    if (validImages.length < 4) {
+      setSubmitError("Vui lòng tải đủ 4 hình ảnh xe (trước, sau, trái, phải)");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setSubmitError(null);
+
+      await addCarApi({
+        ...newCar,
+        images: images.map((img) => img.imageItem),
+        basePrice: newCar?.basePrice,
+      });
+
+      setShowSuccess(true);
+    } catch (error) {
+      setSubmitError("Có lỗi xảy ra khi đăng ký xe. Vui lòng thử lại sau.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
-    <div className="bg-[#f8f9f9] min-h-screen">
-      <div className="container py-6">
-        {/* Back button */}
-        <div className="mb-6">
-          <Link
-            to="/page1"
-            className="flex items-center text-gray-700 hover:underline"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-4 h-4 mr-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Quay lại
-          </Link>
-        </div>
-
-        {/* Title */}
-        <h1 className="mb-6 text-2xl font-bold text-center text-gray-800">
-          Đăng ký xe
-        </h1>
-
-        {/* Progress Steps */}
-        <div className="mb-6 overflow-hidden bg-white rounded-md shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="w-1/3 text-center py-4 border-b-2 border-[#61c596]">
-              <div className="bg-[#f8f9f9] mx-auto w-8 h-8 rounded-full flex items-center justify-center mb-2">
-                <span className="font-semibold text-gray-800">1</span>
-              </div>
-              <div className="text-sm text-gray-600">Thông tin</div>
-            </div>
-
-            <div className="w-1/3 text-center py-4 border-b-2 border-[#61c596]">
-              <div className="bg-[#f8f9f9] mx-auto w-8 h-8 rounded-full flex items-center justify-center mb-2">
-                <span className="font-semibold text-gray-800">2</span>
-              </div>
-              <div className="text-sm text-gray-600">Cho thuê</div>
-            </div>
-
-            <div className="w-1/3 text-center py-4 border-b-2 border-[#61c596]">
-              <div className="bg-[#61c596] mx-auto w-8 h-8 rounded-full flex items-center justify-center mb-2">
-                <span className="font-semibold text-white">3</span>
-              </div>
-              <div className="text-sm text-gray-600">Hình ảnh</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content */}
+    <>
+      <form onSubmit={handleSubmit}>
         <div className="p-6 mb-6 bg-white rounded-md shadow-sm">
           <h2 className="mb-4 text-lg font-semibold text-gray-800">Hình ảnh</h2>
           <p className="mb-6 text-sm text-gray-600">
@@ -71,64 +52,50 @@ export default function Step3() {
             bạn.
           </p>
 
-          <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
-            {/* Side Image */}
-            <div className="relative overflow-hidden group">
-              <img
-                src="https://ext.same-assets.com/602671651/354092277.png"
-                alt="Car side view"
-                className="object-cover w-full h-40 rounded-md"
-              />
+          {/* Replace old grid with new component */}
+          <ImagesUpload images={images} onChange={setImages} />
 
-              {selectedImages.sideImage && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
-                  <button className="bg-[#61c596] text-white px-4 py-2 rounded-md">
-                    CHỌN HÌNH
-                  </button>
-                </div>
-              )}
+          {submitError && (
+            <div className="p-4 mb-6 text-red-700 bg-red-100 rounded-md">
+              {submitError}
             </div>
+          )}
 
-            {/* Back Image */}
-            <div className="relative overflow-hidden group">
-              <img
-                src="https://ext.same-assets.com/602671651/2315755350.jpeg"
-                alt="Car back view"
-                className="object-cover w-full h-40 rounded-md"
-              />
-
-              {selectedImages.backImage && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black opacity-0 bg-opacity-30">
-                  <button className="bg-[#61c596] text-white px-4 py-2 rounded-md">
-                    CHỌN HÌNH
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Additional content for uploaded images */}
-          <div className="hidden md:block">
-            {/* This section can be populated with more images or upload options */}
+          <div className="p-4 mb-6 text-blue-700 rounded-md bg-blue-50">
+            <h3 className="mb-2 font-semibold">Lưu ý:</h3>
+            <ul className="pl-5 list-disc">
+              <li>Hãy đăng tải ảnh chất lượng cao, rõ nét của xe</li>
+              <li>
+                Không chèn số điện thoại, logo hoặc thông tin cá nhân vào ảnh
+              </li>
+              <li>
+                Đăng tải đầy đủ các góc: ngoại thất, nội thất, mặt trước và sau
+                của xe
+              </li>
+            </ul>
           </div>
         </div>
 
-        {/* Bottom Navigation */}
         <div className="flex mb-8 space-x-4">
-          <Link
-            to="/add-car/step2"
+          <button
+            type="button"
+            onClick={onCancel}
             className="w-1/2 py-3 font-medium text-center text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50"
           >
             Quay lại
-          </Link>
-          <Link
-            to="/"
-            className="w-1/2 py-3 text-center rounded-md bg-[#61c596] text-white font-medium hover:bg-opacity-90"
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className={`w-1/2 py-3 text-center rounded-md bg-[#61c596] text-white font-medium hover:bg-opacity-90 ${
+              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            }`}
           >
-            Đăng ký
-          </Link>
+            {isSubmitting ? "Đang xử lý..." : "Đăng ký"}
+          </button>
         </div>
-      </div>
-    </div>
+      </form>
+      <SuccessModal isOpen={showSuccess} onClose={() => navigate("/my-cars")} />
+    </>
   );
 }

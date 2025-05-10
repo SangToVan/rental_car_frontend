@@ -16,6 +16,20 @@ import BookingDetail from "./pages/BookingDetail";
 import OwnerBookingDetail from "./pages/OwnerBookingDetail";
 import Wallet from "./components/profile/contents/Wallet";
 import CarSetting from "./components/profile/my-car/CarSetting";
+import { useSelector } from "react-redux";
+import { ToastContainer } from "react-toastify";
+import AddCar from "./pages/AddCar";
+import Booking from "./pages/Booking";
+import MyBookingDetail from "./pages/MyBookingDetail";
+import PaymentStatus from "./pages/PaymentStatus";
+
+const ProtectedRoute = () => {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  if (!isAuthenticated) {
+    return <Navigate to="/" replace={true} />;
+  }
+  return <Outlet />;
+};
 
 function App() {
   return (
@@ -25,27 +39,46 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="search" element={<SearchCar />} />
-            <Route path="car/:id" element={<CarDetail />} />
-            <Route path="add-car/step1" element={<Step1 />} />
-            <Route path="add-car/step2" element={<Step2 />} />
-            <Route path="add-car/step3" element={<Step3 />} />
+            <Route path="car/:carId" element={<CarDetail />} />
+            <Route path="add-car" element={<AddCar />} />
             <Route element={<Sidebar />}>
               <Route path="user/profile" element={<Profile />} />
               <Route path="user/favorites" element={<Favorite />} />
-              <Route path="user/bookings" element={<MyBooking />} />
+              <Route path="user/bookings/" element={<MyBooking />} />
               <Route path="user/cars" element={<MyCar />} />
               <Route path="user/car-setting/:carId" element={<CarSetting />} />
               <Route path="user/wallet" element={<Wallet />} />
               <Route path="user/change-password" element={<ChangePassword />} />
             </Route>
-            <Route path="booking" element={<BookingDetail />} />
-            <Route path="booking/owner" element={<OwnerBookingDetail />} />
+            <Route path="rent-car" element={<Booking />} />
+            <Route
+              path="user/bookings/:bookingId"
+              element={<MyBookingDetail />}
+            ></Route>
+            <Route
+              path="owner/booking/:bookingId"
+              element={<OwnerBookingDetail />}
+            />
+            <Route path="/payment-status" element={<PaymentStatus />} />
           </Route>
         </Routes>
       </BrowserRouter>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </>
   );
 }
 
 export default App;
+
 

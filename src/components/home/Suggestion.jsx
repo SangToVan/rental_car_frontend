@@ -1,8 +1,7 @@
-import { mockCars } from "../../utils/mockData";
-import CarCard from "../cars/CarCard";
+import CarCard from "../searchs/CarCard";
 import Button from "../ui/Button";
 
-export default function Suggestion() {
+export default function Suggestion({ cars = [] }) {
   return (
     <>
       {/* Cars Section */}
@@ -12,25 +11,8 @@ export default function Suggestion() {
             Xe Dành Cho Bạn
           </h2>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {mockCars.map((car) => (
-              <CarCard
-                key={car.id}
-                id={car.id}
-                name={car.name}
-                imageUrl={car.images[0]}
-                type={car.type}
-                seats={car.seats}
-                fuel={car.fuel}
-                location={car.location}
-                rating={car.rating}
-                trips={car.trips}
-                originalPrice={car.originalPrice}
-                discountedPrice={car.discountedPrice}
-                discount={car.discount}
-                noDeposit={car.noDeposit}
-                delivery={car.delivery}
-                hourlyPrice={car.hourlyPrice}
-              />
+            {cars.map((item) => (
+              <CarCard key={item.carId} car={item} />
             ))}
           </div>
           <div className="mt-8 text-center">

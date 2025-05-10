@@ -1,19 +1,36 @@
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { registerApi } from "../../../shared/apis/authApi";
+import { login } from "../../../shared/toolkits/authSlice";
+import { toast } from "react-toastify";
 
-export default function SignupModal({ onClose, onSwitchToLogin }) {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [displayName, setDisplayName] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [referralCode, setReferralCode] = useState("");
+export default function SignupModal({ onClose, onSignup, onSwitchToLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // In a real app, implement actual signup logic here
-    onClose();
+  const {
+    register: registerSignUp,
+    handleSubmit: handleSignUpSubmit,
+    formState: { errors: signUpErrors },
+  } = useForm();
+
+  const handleSignUp = async (signupData) => {
+    registerApi({ ...signupData, agreeToTerms }).then((data) => {
+      dispatch(
+        login({
+          access_token: data.data.token,
+          user: data.data.info,
+        })
+      );
+      if (data.data.info?.username) {
+        toast.success(`Welcome, ${data.data.info?.username}`);
+      }
+      onClose();
+      onSignup();
+    });
   };
 
   return (
@@ -44,17 +61,37 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
         <h2 className="mb-6 text-2xl font-bold text-center">Đăng ký</h2>
 
         {/* Form */}
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSignUpSubmit(handleSignUp)}>
           {/* Phone Number Field */}
           <div className="mb-4">
             <label className="block mb-2 text-gray-700">Số điện thoại</label>
             <input
               type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-              required
+              {...registerSignUp("phoneNumber", {
+                required: "Không được bỏ trống ô này",
+              })}
             />
+            {signUpErrors.phoneNumber && (
+              <span className="text-danger">
+                {signUpErrors.phoneNumber.message}
+              </span>
+            )}
+          </div>
+
+          {/* Email Field */}
+          <div className="mb-6">
+            <label className="block mb-2 text-gray-700">Địa chỉ email</label>
+            <input
+              type="email"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
+              {...registerSignUp("email", {
+                required: "Không được bỏ trống ô này",
+              })}
+            />
+            {signUpErrors.email && (
+              <span className="text-danger">{signUpErrors.email.message}</span>
+            )}
           </div>
 
           {/* Display Name Field */}
@@ -62,11 +99,16 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             <label className="block mb-2 text-gray-700">Tên hiển thị</label>
             <input
               type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-              required
+              {...registerSignUp("username", {
+                required: "Không được bỏ trống ô này",
+              })}
             />
+            {signUpErrors.username && (
+              <span className="text-danger">
+                {signUpErrors.username.message}
+              </span>
+            )}
           </div>
 
           {/* Password Field */}
@@ -75,11 +117,16 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-                required
+                {...registerSignUp("password", {
+                  required: "Không được bỏ trống ô này",
+                })}
               />
+              {signUpErrors.password && (
+                <span className="text-red-500">
+                  {signUpErrors.password.message}
+                </span>
+              )}
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center pr-3"
@@ -128,15 +175,22 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
 
           {/* Confirm Password Field */}
           <div className="mb-4">
-            <label className="block mb-2 text-gray-700">Mật khẩu</label>
+            <label className="block mb-2 text-gray-700">
+              Xác nhận mật khẩu
+            </label>
             <div className="relative">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-                required
+                {...registerSignUp("confirmPassword", {
+                  required: "Không được bỏ trống ô này",
+                })}
               />
+              {signUpErrors.confirmPassword && (
+                <span className="text-danger">
+                  {signUpErrors.confirmPassword.message}
+                </span>
+              )}
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center pr-3"
@@ -183,19 +237,6 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
             </div>
           </div>
 
-          {/* Referral Code Field */}
-          <div className="mb-6">
-            <label className="block mb-2 text-gray-700">
-              Mã giới thiệu (nếu có)
-            </label>
-            <input
-              type="text"
-              value={referralCode}
-              onChange={(e) => setReferralCode(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
-          </div>
-
           {/* Terms and Conditions */}
           <div className="flex items-start mb-6">
             <div className="flex items-center h-5">
@@ -218,7 +259,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
                 <a href="#" className="text-green-500 hover:underline">
                   Chính sách bảo vệ dữ liệu cá nhân
                 </a>{" "}
-                của Mioto.
+                của Saoto.
               </label>
             </div>
           </div>

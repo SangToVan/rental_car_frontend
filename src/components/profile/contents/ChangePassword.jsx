@@ -1,30 +1,24 @@
-import { useState } from "react";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useForm } from "react-hook-form";
+import { changePasswordApi } from "../../../shared/apis/authApi";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 export default function ChangePassword() {
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    watch,
+  } = useForm();
 
-  const [formData, setFormData] = useState({
-    currentPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleChangePassword = async (data) => {
+    const { newPassword, oldPassword } = data;
+    const { message } = await changePasswordApi({ newPassword, oldPassword });
+    navigate("/user/profile");
+    toast.success(message);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle password change logic here
-    console.log("Password change submitted:", formData);
-  };
   return (
     <div>
       <h1 className="mb-4 text-2xl font-semibold">Đổi mật khẩu</h1>
@@ -33,7 +27,10 @@ export default function ChangePassword() {
       </p>
 
       <div className="max-w-xl p-6 mx-auto bg-white rounded-lg shadow-sm">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form
+          onSubmit={handleSubmit(handleChangePassword)}
+          className="space-y-6"
+        >
           {/* Current Password */}
           <div>
             <label
@@ -44,24 +41,17 @@ export default function ChangePassword() {
             </label>
             <div className="relative">
               <input
-                type={showCurrentPassword ? "text" : "password"}
-                id="currentPassword"
-                name="currentPassword"
-                value={formData.currentPassword}
-                onChange={handleChange}
+                type="password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                {...register("oldPassword", {
+                  required: "This field is required",
+                })}
               />
-              <button
-                type="button"
-                className="absolute text-gray-500 -translate-y-1/2 right-3 top-1/2"
-                onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-              >
-                {showCurrentPassword ? (
-                  <FiEyeOff size={18} />
-                ) : (
-                  <FiEye size={18} />
-                )}
-              </button>
+              {errors.oldPassword && (
+                <span className="text-red-500">
+                  {errors.oldPassword.message}
+                </span>
+              )}
             </div>
           </div>
 
@@ -75,20 +65,17 @@ export default function ChangePassword() {
             </label>
             <div className="relative">
               <input
-                type={showNewPassword ? "text" : "password"}
-                id="newPassword"
-                name="newPassword"
-                value={formData.newPassword}
-                onChange={handleChange}
+                type="password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                {...register("newPassword", {
+                  required: "This field is required",
+                })}
               />
-              <button
-                type="button"
-                className="absolute text-gray-500 -translate-y-1/2 right-3 top-1/2"
-                onClick={() => setShowNewPassword(!showNewPassword)}
-              >
-                {showNewPassword ? <FiEyeOff size={18} /> : <FiEye size={18} />}
-              </button>
+              {errors.newPassword && (
+                <span className="text-red-500">
+                  {errors.newPassword.message}
+                </span>
+              )}
             </div>
           </div>
 
@@ -102,24 +89,20 @@ export default function ChangePassword() {
             </label>
             <div className="relative">
               <input
-                type={showConfirmPassword ? "text" : "password"}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
+                type="password"
                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                {...register("confirmNewPassword", {
+                  validate: (value) => {
+                    if (value === watch("newPassword")) return true;
+                    return "Passwords do not match";
+                  },
+                })}
               />
-              <button
-                type="button"
-                className="absolute text-gray-500 -translate-y-1/2 right-3 top-1/2"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? (
-                  <FiEyeOff size={18} />
-                ) : (
-                  <FiEye size={18} />
-                )}
-              </button>
+              {errors.confirmNewPassword && (
+                <span className="text-red-500">
+                  {errors.confirmNewPassword.message}
+                </span>
+              )}
             </div>
           </div>
 
@@ -127,7 +110,7 @@ export default function ChangePassword() {
           <div className="text-right">
             <button
               type="submit"
-              className="px-6 py-2 font-medium text-gray-600 bg-gray-200 rounded-md hover:bg-gray-300"
+              className="px-6 py-2 font-medium text-gray-600 bg-gray-200 rounded-md hover:bg-primary hover:text-white"
             >
               Xác nhận
             </button>

@@ -1,15 +1,46 @@
 import { useState } from "react";
+import { loginApi } from "../../../shared/apis/authApi";
+import { login } from "../../../shared/toolkits/authSlice";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+import { useForm } from "react-hook-form";
 
 export default function LoginModal({ onClose, onLogin, onSwitchToSignup }) {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // In a real app, implement actual login logic here
-    onLogin();
+  const dispatch = useDispatch();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm();
+
+  const handleLogIn = async (data) => {
+    loginApi(data).then((data) => {
+      const loginData = data.data;
+
+      dispatch(
+        login({
+          access_token: loginData.token,
+          user: loginData.info,
+        })
+      );
+
+      if (loginData.info?.username) {
+        toast.success(`Welcom, ${loginData.info?.username}`);
+      }
+
+      onClose();
+      onLogin();
+    });
   };
+
+  // const handleSubmit = (e) => {
+  //   e.preventDefault();
+  //   // In a real app, implement actual login logic here
+  //   onLogin();
+  // };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -39,17 +70,21 @@ export default function LoginModal({ onClose, onLogin, onSwitchToSignup }) {
         <h2 className="mb-6 text-2xl font-bold text-center">Đăng nhập</h2>
 
         {/* Form */}
-        <form onSubmit={handleSubmit}>
-          {/* Phone Number Field */}
+        <form onSubmit={handleSubmit(handleLogIn)}>
+          {/* Email Field */}
           <div className="mb-4">
-            <label className="block mb-2 text-gray-700">Số điện thoại</label>
+            <label className="block mb-2 text-gray-700">Email</label>
             <input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
+              type="email"
+              placeholder="Địa chỉ email"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-              required
+              {...register("email", {
+                required: "Không được bỏ trống ô này",
+              })}
             />
+            {errors.email && (
+              <span className="text-danger">{errors.email.message}</span>
+            )}
           </div>
 
           {/* Password Field */}
@@ -58,11 +93,15 @@ export default function LoginModal({ onClose, onLogin, onSwitchToSignup }) {
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mật khẩu"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-green-500"
-                required
+                {...register("password", {
+                  required: "Không được bỏ trống ô này",
+                })}
               />
+              {errors.password && (
+                <span className="text-danger">{errors.password.message}</span>
+              )}
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center pr-3"

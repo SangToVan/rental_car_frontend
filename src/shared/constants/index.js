@@ -1,0 +1,27 @@
+export const API_URL = "http://localhost:8080/api/v1/";
+export const MULTIPLIED_AMOUNT = 1000000;
+export const ROLE = {
+  ADMIN: "ADMIN",
+  CUSTOMER: "CUSTOMER",
+  OWNER: "OWNER",
+};
+
+export const CUSTOMER_TYPE = {
+  RENTER: "RENTER",
+  DRIVER: "DRIVER",
+};
+
+export const BOOKING_STATUS = {
+  PENDING_DEPOSIT: "PENDING_DEPOSIT",
+  CONFIRMED: "CONFIRMED",
+  CANCELLED: "CANCELLED",
+  PICK_UP: "PICK_UP",
+  IN_PROGRESS: "IN_PROGRESS",
+  PENDING_PAYMENT: "PENDING_PAYMENT",
+  COMPLETED: "COMPLETED",
+};
+
+export const UPDATE_WALLET_TYPE = {
+  TOP_UP: "TOP_UP",
+  WITHDRAW: "WITHDRAW",
+};

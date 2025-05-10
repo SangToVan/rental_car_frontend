@@ -1,15 +1,12 @@
 import { Outlet } from "react-router-dom";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
-import { useState } from "react";
 
 export default function Layout() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
   return (
     <>
       <div className="flex flex-col min-h-screen">
-        <Header isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />
+        <Header />
         <main
           id="main"
           className="flex-1"

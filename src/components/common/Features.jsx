@@ -71,7 +71,7 @@ export default function Features({transmission, seats, fuel, fuelConsumption}) {
               />
             </svg>
             <span className="text-xs text-gray-500">Tiêu hao</span>
-            <span className="font-medium">{fuelConsumption}</span>
+            <span className="font-medium">{fuelConsumption} L/100km</span>
           </div>
         </div>
       </div>

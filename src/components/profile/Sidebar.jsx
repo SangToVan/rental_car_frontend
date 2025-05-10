@@ -9,9 +9,19 @@ import {
   FiTruck,
   FiUser,
 } from "react-icons/fi";
-import { NavLink, Outlet } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { logout } from "../../shared/toolkits/authSlice";
 
 export default function Sidebar() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/");
+  };
+
   return (
     <>
       {/* Main Content */}
@@ -105,7 +115,10 @@ export default function Sidebar() {
                 <span>Đổi mật khẩu</span>
               </NavLink>
 
-              <div className="flex items-center px-4 py-3 space-x-3 text-red-500 rounded-lg hover:bg-gray-100">
+              <div
+                onClick={handleLogout}
+                className="flex items-center px-4 py-3 space-x-3 text-red-500 rounded-lg hover:bg-gray-100"
+              >
                 <FiLogOut className="w-5 h-5" />
                 <span>Đăng xuất</span>
               </div>

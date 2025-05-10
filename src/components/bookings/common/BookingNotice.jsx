@@ -4,7 +4,7 @@ export default function BookingNotice({
   notificationText,
   cancelReason,
 }) {
-  if (status === "cancelled") {
+  if (status === "CANCELLED") {
     return (
       <div className="relative p-5 overflow-hidden border-l-4 border-red-300 rounded-lg shadow-sm bg-red-50">
         <div className="flex items-start">
@@ -92,12 +92,12 @@ export default function BookingNotice({
           <p className={`text-base font-medium ${getTextColor()}`}>
             {notificationText}
           </p>
-          {status === "pending" && (
+          {status === "PENDING" && (
             <p className={`mt-1 text-sm ${getSubTextColor()}`}>
               Vui lòng thanh toán để hoàn tất đặt xe
             </p>
           )}
-          {status === "confirm" && (
+          {status === "CONFIRM" && (
             <p className={`mt-1 text-sm ${getSubTextColor()}`}>
               Đặt xe thành công, vui lòng chuẩn bị các giấy tờ cần thiết
             </p>

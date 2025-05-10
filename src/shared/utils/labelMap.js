@@ -1,0 +1,12 @@
+export const transmissionMap = {
+  AUTOMATIC: "Số tự động",
+  MANUAL: "Số sàn",
+  SEMI_AUTOMATIC: "Bán tự động",
+};
+
+export const fuelTypeMap = {
+  PETRO: "Xăng",
+  DIESEL: "Dầu",
+  ELECTRIC: "Điện",
+  HYBRID: "Hybrid",
+};

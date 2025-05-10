@@ -6,12 +6,13 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export const CarGallery = ({ images, alt, className }) => {
-  const [mainImage, setMainImage] = useState(images[0]);
+export const CarGallery = ({ images = [], alt, className }) => {
 
   if (images.length === 0) {
     return null;
   }
+
+  const [mainImage, setMainImage] = useState(images[0]?.imageUrl);
 
   return (
     <div className={cn("", className)}>
@@ -39,17 +40,17 @@ export const CarGallery = ({ images, alt, className }) => {
       </div>
 
       <div className="grid grid-cols-4 gap-2 mt-2">
-        {images.slice(0, 4).map((image) => (
+        {images.map((image, index) => (
           <button
-            key={image} // Using the image URL as key
+            key={image?.id || index} // Using the image URL as key
             className={cn(
               "relative aspect-[4/3] overflow-hidden rounded-lg",
               image === mainImage && "ring-2 ring-primary"
             )}
-            onClick={() => setMainImage(image)}
+            onClick={() => setMainImage(image.imageUrl)}
           >
             <img
-              src={image}
+              src={image.imageUrl}
               alt={`${alt} thumbnail`}
               className="object-cover w-full h-full"
             />
