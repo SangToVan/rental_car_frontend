@@ -18,10 +18,13 @@ import {
   INSURANCE_FEE_PER_DAY,
   PASSENGER_INSURANCE_FEE_PER_DAY,
 } from "../shared/utils/rentalPrice";
+import AdditionalFunctions from "../components/cars/AdditionalFunctions";
+import { ADDITIONAL_FUNCTIONS } from "../components/cars/CarConstants";
 
 export default function CarDetail() {
   const { carId } = useParams();
   const [car, setCar] = useState(null);
+  const [images, setImages] = useState([]);
   const searchInfor = useSelector((state) => state.search);
   const [similarCars, setSimilarCars] = useState([]);
   const [startDate, setStartDate] = useState("04/04/2025 21:00");
@@ -34,6 +37,7 @@ export default function CarDetail() {
   useEffect(() => {
     getCarsById(carId).then((data) => {
       setCar(data.data);
+      setImages(data.data?.images);
     });
   }, [carId]);
 
@@ -98,6 +102,10 @@ export default function CarDetail() {
     alert("Đặt xe thành công! Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi.");
   };
 
+  const parsedAdditionalFunctions = car?.additionalFunctions
+    ? car.additionalFunctions.split(",").map((s) => s.trim())
+    : [];
+
   if (!car) {
     return (
       <div className="container py-12">
@@ -133,7 +141,7 @@ export default function CarDetail() {
       <div className="container">
         <div className="grid grid-cols-1 gap-8 mb-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <CarGallery images={car?.images} alt={car.name} />
+            <CarGallery images={images} alt={car.name} />
             <div className="mt-6">
               <div className="flex items-center justify-between mb-4">
                 <h1 className="text-2xl font-bold uppercase">{car.name}</h1>
@@ -179,6 +187,29 @@ export default function CarDetail() {
               </p>
             </div>
 
+            {car.termOfUse && (
+              <div className="mt-8">
+                <h2 className="mb-4 text-xl font-bold">Điều khoản sử dụng</h2>
+                <p className="text-gray-700 whitespace-pre-line">
+                  {car.termOfUse}
+                </p>
+              </div>
+            )}
+
+            {parsedAdditionalFunctions?.length > 0 && (
+              <div className="mt-8">
+                <h2 className="mb-4 text-xl font-bold">Chức năng khác</h2>
+                <AdditionalFunctions
+                  additionalFunctions={parsedAdditionalFunctions}
+                  onChange={() => {}}
+                  className="pointer-events-none select-none"
+                  functionsToShow={ADDITIONAL_FUNCTIONS.filter((f) =>
+                    parsedAdditionalFunctions.includes(f.value)
+                  )}
+                />
+              </div>
+            )}
+
             {/* Car Owner */}
             <div className="mt-8">
               <h2 className="mb-4 text-xl font-bold">Chủ xe</h2>
@@ -219,7 +250,7 @@ export default function CarDetail() {
               </div> */}
             </div>
 
-            <Reviews reviews={car.reviews} />
+            <Reviews reviews={car.feedbacks} />
           </div>
 
           {/* Booking Panel */}
@@ -301,36 +332,56 @@ export default function CarDetail() {
                 </div>
               </div>
 
-              <Button className="w-full">
+              <Button className="w-full" disabled={car.isOwner}>
                 <Link
                   to={`/rent-car?carId=${carId}&${convertToQueryParams(
                     searchInfor
                   )}`}
+                  className={
+                    car.isOwner ? "pointer-events-none text-gray-400" : ""
+                  }
                 >
                   THUÊ NGAY
                 </Link>
               </Button>
+              {car.isOwner && (
+                <p className="mt-2 text-sm text-center text-red-500">
+                  * Bạn là chủ xe này. Không thể tự thuê xe của mình.
+                </p>
+              )}
 
               <div className="mt-4">
                 <h4 className="mb-2 text-sm font-medium">
-                  Phí phụ có thể phát sinh
+                  Phụ phí có thể phát sinh
                 </h4>
                 <div className="space-y-2 text-xs text-gray-600">
                   <div className="flex items-center justify-between">
-                    <span>Phí vượt giới hạn</span>
-                    <span className="font-medium">3.000đ/km</span>
+                    <span> Quãng đường giao xe tối đa</span>
+                    <span className="font-medium">
+                      {car.maxDeliveryDistance} km
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Phí quá giờ</span>
-                    <span className="font-medium">80.000đ/giờ</span>
+                    <span>Phí giao xe</span>
+                    <span className="font-medium">
+                      {currencyFormat(car.deliveryFee)} /km
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Phí vệ sinh</span>
-                    <span className="font-medium">120.000đ</span>
+                    <span>Miễn phí giao xe trong</span>
+                    <span className="font-medium">
+                      {car.freeDeliveryDistance} km
+                    </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>Phí khử mùi</span>
-                    <span className="font-medium">400.000đ</span>
+                    <span>Giới hạn km/ngày</span>
+                    <span className="font-medium">{car.kmPerDay} km/ngày</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span>Phí vượt km/ngày</span>
+                    <span className="font-medium">
+                      {currencyFormat(car.kmOverDayFee)}/km
+                    </span>
                   </div>
                 </div>
               </div>

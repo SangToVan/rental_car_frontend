@@ -37,15 +37,17 @@ export default function Header() {
               >
                 Về chúng tôi
               </Link>
-              <Link
-                to="/add-car"
-                className="font-medium text-mioto-dark hover:text-primary"
-              >
-                Trở thành chủ xe
-              </Link>
+              {user?.role === "CUSTOMER" && (
+                <Link
+                  to="/add-car"
+                  className="font-medium text-mioto-dark hover:text-primary"
+                >
+                  Trở thành chủ xe
+                </Link>
+              )}
               {isAuthenticated && (
                 <Link
-                  to="/booking"
+                  to="user/bookings/"
                   className="font-medium text-mioto-dark hover:text-primary"
                 >
                   Chuyến của tôi

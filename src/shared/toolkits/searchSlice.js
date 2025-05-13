@@ -2,6 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
   getSearchLocation,
   setSearchLocation,
+  getSearchTime,
+  setSearchTime,
 } from "../services/storageService";
 
 const addDays = (date, days) => {
@@ -27,12 +29,14 @@ const today = new Date();
 const nextHour = new Date(today);
 nextHour.setHours(today.getHours() + 1);
 
+const savedTime = getSearchTime();
+
 const initialState = {
   location: getSearchLocation(),
-  sD: formatDate(nextHour),
-  sT: formatTime(nextHour),
-  eD: formatDate(addDays(nextHour, 2)),
-  eT: formatTime(nextHour),
+  sD: savedTime.sD || formatDate(nextHour),
+  sT: savedTime.sT || formatTime(nextHour),
+  eD: savedTime.eD || formatDate(addDays(nextHour, 2)),
+  eT: savedTime.eT || formatTime(nextHour),
 };
 
 export const searchSlice = createSlice({
@@ -40,12 +44,20 @@ export const searchSlice = createSlice({
   initialState,
   reducers: {
     setSearchInfor: (state, action) => {
-      state.location = action.payload?.location;
-      state.sD = action.payload?.sD;
-      state.sT = action.payload?.sT;
-      state.eD = action.payload?.eD;
-      state.eT = action.payload?.eT;
-      setSearchLocation(action.payload.location);
+      Object.assign(state, action.payload);
+      if (
+        action.payload.sD &&
+        action.payload.sT &&
+        action.payload.eD &&
+        action.payload.eT
+      ) {
+        setSearchTime(
+          action.payload.sD,
+          action.payload.sT,
+          action.payload.eD,
+          action.payload.eT
+        );
+      }
     },
   },
 });

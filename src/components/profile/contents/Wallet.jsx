@@ -1,68 +1,37 @@
-import { useState } from "react";
-
-// Mock data for wallet transactions
-const mockTransactions = [
-  {
-    id: 1,
-    date: "2023-12-15",
-    type: "topup",
-    amount: 500000,
-    status: "completed",
-    description: "Top up via Momo",
-  },
-  {
-    id: 2,
-    date: "2023-12-10",
-    type: "payment",
-    amount: -350000,
-    status: "completed",
-    description: "Payment for trip #MIO-9876",
-  },
-  {
-    id: 3,
-    date: "2023-11-28",
-    type: "topup",
-    amount: 1000000,
-    status: "completed",
-    description: "Top up via Bank Transfer",
-  },
-  {
-    id: 4,
-    date: "2023-11-20",
-    type: "withdraw",
-    amount: -500000,
-    status: "completed",
-    description: "Withdrawal to Bank Account",
-  },
-  {
-    id: 5,
-    date: "2023-11-12",
-    type: "payment",
-    amount: -650000,
-    status: "completed",
-    description: "Payment for trip #MIO-8765",
-  },
-];
+import { useEffect, useState } from "react";
+import {
+  getMyWalletApi,
+  updateMyWalletApi,
+} from "../../../shared/apis/userApi";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Wallet(props) {
-  const { balance = 1250000 } = props;
+  const [loading, setLoading] = useState(true);
+  const [balance, setBalance] = useState(0);
+  const [transaction, setTransaction] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
+  const [amountInput, setAmountInput] = useState("");
 
-  const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(amount);
-  };
+  useEffect(() => {
+    setLoading(true);
+    getMyWalletApi()
+      .then((res) => {
+        const walletData = res?.data;
+        setBalance(walletData?.balance || "0");
+        setTransaction(walletData?.transactionList || []);
+      })
+      .finally(() => setLoading(false));
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "completed":
+      case "SUCCESS":
         return "text-green-600";
-      case "pending":
+      case "PENDING":
         return "text-yellow-600";
-      case "failed":
+      case "FAILED":
         return "text-red-600";
       default:
         return "text-gray-600";
@@ -71,24 +40,53 @@ export default function Wallet(props) {
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case "topup":
+      case "TOP_UP":
+      case "CREDIT":
         return "↑";
-      case "payment":
-        return "→";
-      case "withdraw":
+      case "DEBIT":
+      case "WITHDRAW":
         return "↓";
       default:
         return "•";
     }
   };
 
-  const getAmountColor = (amount) => {
-    return amount >= 0 ? "text-green-600" : "text-red-600";
+  const getAmountColor = (type) => {
+    switch (type) {
+      case "TOP_UP":
+      case "CREDIT":
+        return "text-green-600";
+      case "DEBIT":
+      case "WITHDRAW":
+        return "text-red-600";
+      default:
+        return "text-gray-600";
+    }
   };
 
   const openModal = (type) => {
     setModalType(type);
     setModalOpen(true);
+  };
+
+  const formatDateTime = (datetimeStr) => {
+    const date = new Date(datetimeStr);
+    return date.toLocaleString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  const formatCurrency = (value) => {
+    const num = Number(value);
+    return num.toLocaleString("vi-VN", {
+      style: "currency",
+      currency: "VND",
+      minimumFractionDigits: 0,
+    });
   };
 
   return (
@@ -140,35 +138,35 @@ export default function Wallet(props) {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {mockTransactions.map((transaction) => (
-                <tr key={transaction.id} className="hover:bg-gray-50">
+              {transaction.map((tx, index) => (
+                <tr key={index} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                    {transaction.date}
+                    {formatDateTime(tx.transactionDate)}
                   </td>
                   <td className="px-6 py-4 text-sm whitespace-nowrap">
                     <span className="flex items-center">
                       <span className="mr-2 text-lg">
-                        {getTypeIcon(transaction.type)}
+                        {getTypeIcon(tx.transactionType)}
                       </span>
-                      <span className="capitalize">{transaction.type}</span>
+                      <span className="capitalize">{tx.transactionType}</span>
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                    {transaction.description}
+                    {tx.description}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-sm font-medium text-right ${getAmountColor(
-                      transaction.amount
+                      tx.transactionType
                     )}`}
                   >
-                    {formatCurrency(transaction.amount)}
+                    {formatCurrency(tx.amount)}
                   </td>
                   <td
                     className={`px-6 py-4 whitespace-nowrap text-sm text-right ${getStatusColor(
-                      transaction.status
+                      tx.status
                     )}`}
                   >
-                    <span className="capitalize">{transaction.status}</span>
+                    <span className="capitalize">{tx.status}</span>
                   </td>
                 </tr>
               ))}
@@ -177,7 +175,7 @@ export default function Wallet(props) {
         </div>
       </div>
 
-      {/* Modal for Top-up or Withdraw */}
+      {/* Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="w-full max-w-md p-6 bg-white rounded-lg">
@@ -192,6 +190,8 @@ export default function Wallet(props) {
                 className="w-full px-3 py-2 leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                 type="number"
                 placeholder="Nhập số tiền"
+                value={amountInput}
+                onChange={(e) => setAmountInput(e.target.value)}
               />
             </div>
             {modalType === "topup" && (
@@ -222,19 +222,43 @@ export default function Wallet(props) {
             <div className="flex justify-end mt-6 space-x-2">
               <button
                 className="px-4 py-2 font-bold text-gray-800 bg-gray-300 rounded hover:bg-gray-400"
-                onClick={() => setModalOpen(false)}
+                onClick={() => {
+                  setModalOpen(false);
+                  setAmountInput("");
+                }}
               >
                 Hủy
               </button>
               <button
                 className="px-4 py-2 font-bold text-white bg-green-500 rounded hover:bg-green-600"
-                onClick={() => {
-                  alert(
-                    `${
-                      modalType === "topup" ? "Nạp tiền" : "Rút tiền"
-                    } thành công!`
-                  );
-                  setModalOpen(false);
+                onClick={async () => {
+                  const amount = parseInt(amountInput);
+                  if (isNaN(amount) || amount < 100000) {
+                    toast.error("Số tiền phải lớn hơn 100.000 VND");
+                    return;
+                  }
+
+                  if (modalType === "withdraw" && amount > parseInt(balance)) {
+                    toast.error("Số tiền rút không được lớn hơn số dư ví");
+                    return;
+                  }
+
+                  try {
+                    await updateMyWalletApi({
+                      type: modalType === "topup" ? "TOP_UP" : "WITHDRAW",
+                      amount: amount.toString(),
+                    });
+                    toast.success(
+                      `${
+                        modalType === "topup" ? "Nạp tiền" : "Rút tiền"
+                      } thành công`
+                    );
+                    setModalOpen(false);
+                    setAmountInput("");
+                    setTimeout(() => window.location.reload(), 1500);
+                  } catch (err) {
+                    toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
+                  }
                 }}
               >
                 {modalType === "topup" ? "Nạp tiền" : "Rút tiền"}
@@ -243,6 +267,8 @@ export default function Wallet(props) {
           </div>
         </div>
       )}
+
+      <ToastContainer />
     </div>
   );
 }

@@ -14,7 +14,6 @@ export default function Step3({ newCar = {}, setNewCar, nextStep, onCancel }) {
 
   const [showSuccess, setShowSuccess] = useState(false);
 
-
   const handleSubmit = async (event) => {
     event?.preventDefault();
 

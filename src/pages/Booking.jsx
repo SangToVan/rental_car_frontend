@@ -290,13 +290,15 @@ export default function Booking() {
                   <div className="w-10 h-10 mr-3 overflow-hidden rounded-full">
                     <img
                       src={car?.carOwner.avatar}
-                      alt={car?.carOwner.name}
+                      alt={car?.carOwner.username}
                       className="object-cover w-full h-full"
                     />
                   </div>
                   <div>
                     <h3 className="font-bold">Chủ xe</h3>
-                    <p className="text-lg font-medium">{car?.carOwner.name}</p>
+                    <p className="text-lg font-medium">
+                      {car?.carOwner.username}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center mb-4">
@@ -304,11 +306,11 @@ export default function Booking() {
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
                   </svg>
                   <span className="ml-1 text-sm font-medium">
-                    {car?.carOwner.rating}
+                    {car?.carOwner?.rating || 0}
                   </span>
                   <span className="mx-1 text-gray-300">•</span>
                   <span className="text-sm text-gray-500">
-                    {car?.carOwner.trips} chuyến
+                    {car?.carOwner?.trips || 0} chuyến
                   </span>
                 </div>
               </div>

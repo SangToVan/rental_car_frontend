@@ -32,6 +32,28 @@ export const getMyBookingApi = async ({
   return res.data;
 };
 
+export const getUnfinishedMyBookingApi = async ({
+  page = 1,
+  size = 5,
+  sort = "bookingDate:desc",
+}) => {
+  const searchParams = generateMetaSearchParams(page, size, sort);
+  const res = await axiosInstance.get(
+    `bookings/own/unfinished?${searchParams}`
+  );
+  return res.data;
+};
+
+export const getFinishedMyBookingApi = async ({
+  page = 1,
+  size = 5,
+  sort = "bookingDate:desc",
+}) => {
+  const searchParams = generateMetaSearchParams(page, size, sort);
+  const res = await axiosInstance.get(`bookings/own/finished?${searchParams}`);
+  return res.data;
+};
+
 export const addBookingApi = async (data) => {
   const res = await axiosInstance.post("bookings", data);
   return res.data;

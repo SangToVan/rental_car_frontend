@@ -2,9 +2,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "./layouts/Layout";
 import Home from "./pages/Home";
 import CarDetail from "./pages/CarDetail";
-import Step1 from "./components/add_car/Step1";
-import Step2 from "./components/add_car/Step2";
-import Step3 from "./components/add_car/Step3";
 import SearchCar from "./pages/SearchCar";
 import Sidebar from "./components/profile/Sidebar";
 import Profile from "./components/profile/contents/Profile";
@@ -12,7 +9,6 @@ import Favorite from "./components/profile/contents/Favorite";
 import MyBooking from "./components/profile/contents/MyBooking";
 import MyCar from "./components/profile/contents/MyCar";
 import ChangePassword from "./components/profile/contents/ChangePassword";
-import BookingDetail from "./pages/BookingDetail";
 import OwnerBookingDetail from "./pages/OwnerBookingDetail";
 import Wallet from "./components/profile/contents/Wallet";
 import CarSetting from "./components/profile/my-car/CarSetting";
@@ -22,6 +18,7 @@ import AddCar from "./pages/AddCar";
 import Booking from "./pages/Booking";
 import MyBookingDetail from "./pages/MyBookingDetail";
 import PaymentStatus from "./pages/PaymentStatus";
+import AdminPage from "./pages/AdminPage";
 
 const ProtectedRoute = () => {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -60,6 +57,7 @@ function App() {
               element={<OwnerBookingDetail />}
             />
             <Route path="/payment-status" element={<PaymentStatus />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
@@ -80,5 +78,4 @@ function App() {
 }
 
 export default App;
-
 

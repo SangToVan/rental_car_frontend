@@ -1,17 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  FaMapMarkerAlt,
-  FaCalendarAlt,
-  FaMapMarkedAlt,
-  FaChevronLeft,
-  FaSync,
-  FaCarSide,
-  FaBuilding,
-  FaUser,
-  FaClock,
-  FaFileInvoiceDollar,
-  FaImage,
-} from "react-icons/fa";
+import { FaMapMarkerAlt, FaCalendarAlt, FaChevronLeft } from "react-icons/fa";
 import Select from "react-select";
 import { vietnamLocations } from "../../shared/locations";
 import TimeModal from "./modals/TimeModal";
@@ -47,6 +35,20 @@ export default function SearchBar({ onSubmit }) {
   }, [searchInfor, reset]);
 
   useEffect(() => {
+    if (
+      searchInfor?.sD &&
+      searchInfor?.sT &&
+      searchInfor?.eD &&
+      searchInfor?.eT
+    ) {
+      const pickup = convertToLocalDateTime(searchInfor.sD, searchInfor.sT);
+      const dropoff = convertToLocalDateTime(searchInfor.eD, searchInfor.eT);
+      setPickupDateTime(pickup);
+      setReturnDateTime(dropoff);
+    }
+  }, [searchInfor]);
+
+  useEffect(() => {
     if (pickupDateTime && returnDateTime) {
       const sD = pickupDateTime.toISOString().split("T")[0];
       const sT = pickupDateTime.toTimeString().slice(0, 5);
@@ -71,7 +73,6 @@ export default function SearchBar({ onSubmit }) {
     setPickupDateTime(pickupDateTime);
     setReturnDateTime(returnDateTime);
 
-    // Cập nhật vào react-hook-form
     setValue("sD", sD);
     setValue("sT", sT);
     setValue("eD", eD);
@@ -103,68 +104,20 @@ export default function SearchBar({ onSubmit }) {
     if (onSubmit) onSubmit(data);
   };
 
-  const timeRangeDisplay =
-    pickupDateTime && returnDateTime
-      ? `${pickupDateTime.toLocaleString()} → ${returnDateTime.toLocaleString()}`
-      : null;
-
   return (
-    // <form onSubmit={handleSubmit(onHandleSubmit)}>
-    //   <div className="p-4 bg-white shadow-sm">
-    //     <div className="flex flex-wrap items-center gap-4">
-    //       <div className="flex items-center w-72">
-    //         <FaMapMarkerAlt className="mr-2 text-gray-600" />
-    //         <Select
-    //           value={location}
-    //           onChange={handleLocationChange}
-    //           options={vietnamLocations}
-    //           placeholder="Chọn địa điểm"
-    //           classNamePrefix="react-select"
-    //           className="flex-1"
-    //           isSearchable
-    //         />
-    //         <input
-    //           type="hidden"
-    //           {...register("location", { required: "Vui lòng chọn địa điểm!" })}
-    //         />
-    //       </div>
-
-    //       <div
-    //         className="flex items-center text-gray-800 cursor-pointer"
-    //         onClick={() => setShowTimeModal(true)}
-    //       >
-    //         <FaCalendarAlt className="mr-2 text-gray-600" />
-    //         <span>{timeRangeDisplay || "Chọn thời gian thuê"}</span>
-    //       </div>
-    //     </div>
-
-    //     <input type="hidden" {...register("sD")} />
-    //     <input type="hidden" {...register("sT")} />
-    //     <input type="hidden" {...register("eD")} />
-    //     <input type="hidden" {...register("eT")} />
-
-    //     {showTimeModal && (
-    //       <TimeModal
-    //         onClose={() => setShowTimeModal(false)}
-    //         onSelectTime={handleTimeSelection}
-    //       />
-    //     )}
-    //   </div>
-    // </form>
-
     <form
       onSubmit={handleSubmit(onHandleSubmit)}
       className="bg-white shadow-sm"
     >
-      <div className="container px-4 mx-auto">
-        {/* Top search bar */}
-        <div className="flex items-center py-3">
-          <button className="mr-2 text-gray-500">
+      <div className="container px-4 py-4 mx-auto space-y-4">
+        {/* Top search section */}
+        <div className="flex flex-wrap items-center gap-4">
+          <button type="button" className="text-gray-500">
             <FaChevronLeft />
           </button>
 
-          <div className="flex items-center ml-2 text-gray-800 cursor-pointer">
-            <FaMapMarkerAlt className="mr-2 text-gray-600" />
+          <div className="flex items-center gap-2 text-gray-800">
+            <FaMapMarkerAlt className="text-gray-600" />
             <Controller
               name="location"
               control={control}
@@ -188,14 +141,12 @@ export default function SearchBar({ onSubmit }) {
               )}
             />
             {errors.location && (
-              <p className="mt-1 text-sm text-red-500">
-                {errors.location.message}
-              </p>
+              <p className="text-sm text-red-500">{errors.location.message}</p>
             )}
           </div>
 
           <div
-            className="flex items-center ml-4 text-gray-800 cursor-pointer"
+            className="flex items-center text-gray-800 cursor-pointer"
             onClick={() => setShowTimeModal(true)}
           >
             <FaCalendarAlt className="mr-2 text-gray-600" />
@@ -207,67 +158,59 @@ export default function SearchBar({ onSubmit }) {
           </div>
         </div>
 
+        {/* Hidden time values */}
         <input type="hidden" {...register("sD")} />
         <input type="hidden" {...register("sT")} />
         <input type="hidden" {...register("eD")} />
         <input type="hidden" {...register("eT")} />
 
-        {/* Filter options */}
-        <div className="flex flex-wrap items-center py-3 border-t border-gray-200">
-          <button className="flex items-center mr-4 text-gray-700">
-            <FaSync className="mr-2" />
-            <span>Cập nhật</span>
-          </button>
+        {/* Bộ lọc mở rộng */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <input
+            {...register("brand")}
+            placeholder="Hãng xe (VD: Toyota)"
+            className="p-2 border rounded"
+          />
+          <input
+            type="number"
+            {...register("numberOfSeats")}
+            placeholder="Số chỗ ngồi"
+            className="p-2 border rounded"
+          />
+          <select {...register("transmission")} className="p-2 border rounded">
+            <option value="">-- Hộp số --</option>
+            <option value="AUTOMATIC">Tự động</option>
+            <option value="MANUAL">Số sàn</option>
+            <option value="SEMI_AUTOMATIC">Bán tự động</option>
+          </select>
+          <select {...register("fuelType")} className="p-2 border rounded">
+            <option value="">-- Nhiên liệu --</option>
+            <option value="PETRO">Xăng</option>
+            <option value="DIESEL">Dầu</option>
+            <option value="ELECTRIC">Điện</option>
+            <option value="HYBRID">Hybrid</option>
+          </select>
+          <input
+            type="number"
+            {...register("minPrice")}
+            placeholder="Giá từ"
+            className="p-2 border rounded"
+          />
+          <input
+            type="number"
+            {...register("maxPrice")}
+            placeholder="Giá đến"
+            className="p-2 border rounded"
+          />
+        </div>
 
-          <button className="flex items-center mr-4 text-gray-700">
-            <FaCarSide className="mr-2" />
-            <span>Loại xe</span>
-          </button>
-
-          <button className="flex items-center mr-4 text-gray-700">
-            <FaBuilding className="mr-2" />
-            <span>Hãng xe</span>
-          </button>
-
-          <button className="flex items-center mr-4 text-gray-700">
-            <FaUser className="mr-2" />
-            <span>Chủ xe 5⭐</span>
-          </button>
-
-          <button className="flex items-center mr-4 text-gray-700">
-            <FaMapMarkedAlt className="mr-2" />
-            <span>Giao nhận tận nơi</span>
-          </button>
-
-          <button className="flex items-center mr-4 text-gray-700">
-            <FaClock className="mr-2" />
-            <span>Thuê giờ</span>
-          </button>
-
-          <button className="flex items-center mr-4 text-gray-700">
-            <FaFileInvoiceDollar className="mr-2" />
-            <span>Đặt xe nhanh</span>
-          </button>
-
-          <button className="flex items-center mr-4 text-gray-700">
-            <FaImage className="mr-2" />
-            <span>Miễn thế chấp</span>
-          </button>
-
-          <button className="flex items-center ml-auto text-gray-700">
-            <span>Bộ lọc</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="w-5 h-5 ml-2"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-            >
-              <path
-                fillRule="evenodd"
-                d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z"
-                clipRule="evenodd"
-              />
-            </svg>
+        {/* Submit */}
+        <div className="mt-4 text-center">
+          <button
+            type="submit"
+            className="px-6 py-2 text-white rounded-md bg-primary hover:bg-primary-dark"
+          >
+            Tìm xe
           </button>
         </div>
       </div>

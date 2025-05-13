@@ -3,6 +3,23 @@ const ACCESS_TOKEN = "rcs_access_token";
 const REFRESH_TOKEN = "rcs_refresh_token";
 const DISPLAY_TYPE = "rcs_display_type";
 const SEARCH_LOCATION = "rcs_location";
+const SEARCH_TIME = "rcs_search_time";
+
+export const setSearchTime = (sD, sT, eD, eT) => {
+  const payload = { sD, sT, eD, eT };
+  localStorage.setItem(SEARCH_TIME, JSON.stringify(payload));
+};
+
+export const getSearchTime = () => {
+  const raw = localStorage.getItem(SEARCH_TIME);
+  try {
+    const data = JSON.parse(raw);
+    return data || {};
+  } catch {
+    return {};
+  }
+};
+
 
 export const setSearchResultsDisplayType = (type) => {
   localStorage.setItem(DISPLAY_TYPE, type);

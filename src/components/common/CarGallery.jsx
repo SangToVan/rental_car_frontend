@@ -7,12 +7,11 @@ function cn(...inputs) {
 }
 
 export const CarGallery = ({ images = [], alt, className }) => {
-
   if (images.length === 0) {
     return null;
   }
 
-  const [mainImage, setMainImage] = useState(images[0]?.imageUrl);
+  const [mainImage, setMainImage] = useState(images[0].imageUrl);
 
   return (
     <div className={cn("", className)}>

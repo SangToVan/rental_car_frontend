@@ -22,17 +22,21 @@ export default function SearchCar() {
     setLoading(true);
     getCarsApi(currentPage, perPage, sortType, searchInfor)
       .then((data) => {
-        setCars(data?.data);
-        const meta = data?.meta;
-        setTotalItems(meta?.totalItems);
-        if (meta?.totalPages !== totalPages) setTotalPages(meta?.totalPages);
-        if (meta?.currentPage + 1 !== currentPage)
-          setCurrentPage(meta?.currentPage + 1);
+        setCars(data?.data || []);
+        const meta = data?.meta || {};
+        setTotalItems(meta.totalItems || 0);
+        setTotalPages(meta.totalPages || 1);
+      })
+      .catch((err) => {
+        console.error("Lỗi khi lấy danh sách xe:", err);
+        setCars([]);
+        setTotalItems(0);
+        setTotalPages(1);
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [perPage, currentPage, sortType, searchInfor, totalPages]);
+  }, [perPage, currentPage, sortType, searchInfor]);
 
   const handlePerPageChange = useCallback((e) => {
     const value = parseInt(e.target.value, 10);
@@ -42,10 +46,14 @@ export default function SearchCar() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <SearchBar />
+      <SearchBar onSubmit={() => setCurrentPage(1)} />
       <div className="p-4">
         {loading ? (
           <div className="text-center text-gray-500">Đang tải dữ liệu...</div>
+        ) : cars.length === 0 ? (
+          <div className="text-center text-gray-500">
+            Không tìm thấy xe phù hợp
+          </div>
         ) : (
           <CarGrid cars={cars} />
         )}

@@ -69,7 +69,7 @@ export default function OwnerBookingDetail() {
     const { message } = await confirmBookingApi(bookingId);
     toast.success(message);
     setShowConfirmBookingModal(false);
-    navigate(`/owner/bookings/${bookingId}`);
+    navigate(`/owner/booking/${bookingId}`);
   };
 
   const handleCancelBooking = async () => {

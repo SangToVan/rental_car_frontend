@@ -1,20 +1,20 @@
 import { useEffect, useState } from "react";
-import ProgressSteps from "../components/bookings/ProgressSteps";
-import BookingNotice from "../components/bookings/common/BookingNotice";
-import CarInformation from "../components/bookings/booking-infor/CarInformation";
-import OwnerInformation from "../components/bookings/booking-infor/OwnerInformation";
-import BookingSummary from "../components/bookings/booking-infor/BookingSummary";
-import RentalPeriod from "../components/bookings/common/RentalPeriod";
-import RentalDocuments from "../components/bookings/common/RentalDocuments";
-import RentalAccessories from "../components/bookings/common/RentalAccessories";
-import RentalTerms from "../components/bookings/common/RentalTerms";
-import CancellationPolicy from "../components/bookings/common/CancellationPolicy";
-import PaymentOption from "../components/bookings/payment/PaymentOption";
-import Reviews from "../components/bookings/reviews/Reviews";
-import { mockBookings } from "../utils/mockData";
+import ProgressSteps from "../../components/bookings/ProgressSteps";
+import BookingNotice from "../../components/bookings/common/BookingNotice";
+import CarInformation from "../../components/bookings/booking-infor/CarInformation";
+import OwnerInformation from "../../components/bookings/booking-infor/OwnerInformation";
+import BookingSummary from "../../components/bookings/booking-infor/BookingSummary";
+import RentalPeriod from "../../components/bookings/common/RentalPeriod";
+import RentalDocuments from "../../components/bookings/common/RentalDocuments";
+import RentalAccessories from "../../components/bookings/common/RentalAccessories";
+import RentalTerms from "../../components/bookings/common/RentalTerms";
+import CancellationPolicy from "../../components/bookings/common/CancellationPolicy";
+import PaymentOption from "../../components/bookings/payment/PaymentOption";
+import Reviews from "../../components/bookings/reviews/Reviews";
+import { mockBookings } from "../../utils/mockData";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import RequestError from "../pages/error/RequestError";
-import { addBookingApi } from "../shared/apis/bookingApi";
+import RequestError from "../error/RequestError";
+import { addBookingApi } from "../../shared/apis/bookingApi";
 
 export default function BookingDetail() {
   const [bookingDetails, setBookingDetails] = useState(null);

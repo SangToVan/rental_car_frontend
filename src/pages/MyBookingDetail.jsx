@@ -65,13 +65,13 @@ export default function MyBookingDetail() {
   const handleCancelBooking = async () => {
     const { message } = await cancelBookingApi(bookingId);
     toast.success(message);
-    navigate(`/user/bookings/${bookingId}`);
+    window.location.reload();
   };
 
   const handleConfirmPickup = async () => {
     const { message } = await confirmPickUpApi(bookingId);
     toast.success(message);
-    navigate(`/user/bookings/${bookingId}`);
+    window.location.reload();
   };
 
   const [star, setStar] = useState(0);
