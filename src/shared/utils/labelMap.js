@@ -10,3 +10,11 @@ export const fuelTypeMap = {
   ELECTRIC: "Điện",
   HYBRID: "Hybrid",
 };
+
+export const relationshipMap = {
+  FAMILY: "Người thân",
+  FRIEND: "Bạn bè",
+  COLLEAGUE: "Đồng nghiệp",
+  DRIVER: "Tài xế thuê",
+  OTHER: "Khác",
+};

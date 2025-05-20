@@ -115,15 +115,15 @@ export default function ProgressSteps({ currentStep }) {
 
   return (
     <div className="w-full p-4 mb-8 bg-white rounded-lg shadow-sm md:p-6">
-      <div className="items-center justify-between hidden md:flex">
+      <div className="flex items-center justify-between w-full">
         {steps.map((step, index) => (
           <React.Fragment key={step.id}>
-            {/* Step Square */}
+            {/* Step Item */}
             <div className="flex flex-col items-center">
               <div
-                className={`flex h-14 w-14 items-center justify-center rounded-xl ${getStepClass(
+                className={`flex h-14 w-14 items-center justify-center rounded-xl border-2 shadow-sm ${getStepClass(
                   step.id
-                )} border-2 shadow-sm`}
+                )}`}
               >
                 {step.icon}
               </div>
@@ -132,15 +132,19 @@ export default function ProgressSteps({ currentStep }) {
               </p>
             </div>
 
-            {/* Connector Line (don't show after the last step) */}
+            {/* Connector Line */}
             {index < steps.length - 1 && (
-              <div
-                className="h-0.5 w-16 md:w-20 lg:w-28 xl:w-36"
-                style={{
-                  backgroundColor:
-                    currentStep > index + 1 ? "#4ade80" : "#e5e7eb",
-                }}
-              ></div>
+              <div className="flex justify-center flex-1">
+                <div className="w-full max-w-[80px] h-[2px] my-6 bg-gray-200 relative">
+                  <div
+                    className="absolute top-0 left-0 h-full transition-all"
+                    style={{
+                      width: currentStep > index + 1 ? "100%" : "0%",
+                      backgroundColor: "#4ade80",
+                    }}
+                  ></div>
+                </div>
+              </div>
             )}
           </React.Fragment>
         ))}

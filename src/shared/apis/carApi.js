@@ -13,8 +13,15 @@ export const getCarsByOwner = async ({
   return res.data;
 };
 
-export const getCarsById = async (carId) => {
-  const res = await axiosInstance.get(`cars/${carId}`);
+export const getCarsById = async (carId, startDateTime, endDateTime) => {
+  const params = {};
+
+  if (startDateTime && endDateTime) {
+    params.startDateTime = startDateTime;
+    params.endDateTime = endDateTime;
+  }
+
+  const res = await axiosInstance.get(`cars/${carId}`, { params });
   return res.data;
 };
 
@@ -110,8 +117,14 @@ export const getCarBookingApi = async (
   sort = "id:desc"
 ) => {
   const searchParams = generateMetaSearchParams(page, size, sort);
+  const query = new URLSearchParams(searchParams);
+
+  if (status) {
+    query.append("status", status);
+  }
+
   const res = await axiosInstance.get(
-    `cars/own/${carId}/bookings?${searchParams}&status=${status}`
+    `cars/own/${carId}/bookings?${query.toString()}`
   );
   return res.data;
 };

@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
+import {
+  getProvinces,
+  getDistrictsByProvinceCode,
+  getWardsByDistrictCode,
+} from "@do-kevin/pc-vn";
 
 const AddressModal = ({ isOpen, onClose, onApply, initialAddress }) => {
   const [city, setCity] = useState("");
@@ -12,48 +17,15 @@ const AddressModal = ({ isOpen, onClose, onApply, initialAddress }) => {
 
   const isFormComplete = city && district && street;
 
-  const cities = [
-    "Hà Nội",
-    "Hồ Chí Minh",
-    "Đà Nẵng",
-    "Hải Phòng",
-    "Cần Thơ",
-    "An Giang",
-    "Bà Rịa - Vũng Tàu",
-  ];
-
-  const getDistricts = (city) => {
-    const map = {
-      "Hà Nội": [
-        "Ba Đình",
-        "Hoàn Kiếm",
-        "Tây Hồ",
-        "Long Biên",
-        "Cầu Giấy",
-        "Đống Đa",
-        "Hai Bà Trưng",
-      ],
-      "Hồ Chí Minh": [
-        "Quận 1",
-        "Quận 2",
-        "Quận 3",
-        "Quận 4",
-        "Quận 5",
-        "Quận 6",
-        "Quận 7",
-        "Quận 8",
-      ],
-    };
-    return map[city] || [];
-  };
-
-  const getWards = (district) => {
-    const map = {
-      "Ba Đình": ["Phúc Xá", "Trúc Bạch", "Vĩnh Phúc", "Cống Vị", "Liễu Giai"],
-      "Quận 1": ["Bến Nghé", "Bến Thành", "Cầu Kho", "Cô Giang", "Đa Kao"],
-    };
-    return map[district] || [];
-  };
+  const provinces = getProvinces();
+  const selectedProvince = provinces.find((p) => p.name === city);
+  const districts = selectedProvince
+    ? getDistrictsByProvinceCode(selectedProvince.code)
+    : [];
+  const selectedDistrict = districts.find((d) => d.name === district);
+  const wards = selectedDistrict
+    ? getWardsByDistrictCode(selectedDistrict.code)
+    : [];
 
   const handleCityChange = (e) => {
     const value = e.target.value;
@@ -125,9 +97,9 @@ const AddressModal = ({ isOpen, onClose, onApply, initialAddress }) => {
               className="w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-[#61c596]"
             >
               <option value="">Chọn thành phố</option>
-              {cities.map((c) => (
-                <option key={c} value={c}>
-                  {c}
+              {provinces.map((p) => (
+                <option key={p.code} value={p.name}>
+                  {p.name}
                 </option>
               ))}
             </select>
@@ -144,9 +116,9 @@ const AddressModal = ({ isOpen, onClose, onApply, initialAddress }) => {
               <option value="">
                 {districtDisabled ? "Chọn thành phố trước" : "Chọn quận/huyện"}
               </option>
-              {getDistricts(city).map((d) => (
-                <option key={d} value={d}>
-                  {d}
+              {districts.map((d) => (
+                <option key={d.code} value={d.name}>
+                  {d.name}
                 </option>
               ))}
             </select>
@@ -163,9 +135,9 @@ const AddressModal = ({ isOpen, onClose, onApply, initialAddress }) => {
               <option value="">
                 {wardDisabled ? "Chọn quận huyện trước" : "Chọn phường/xã"}
               </option>
-              {getWards(district).map((w) => (
-                <option key={w} value={w}>
-                  {w}
+              {wards.map((w) => (
+                <option key={w.code} value={w.name}>
+                  {w.name}
                 </option>
               ))}
             </select>

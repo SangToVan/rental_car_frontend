@@ -171,7 +171,12 @@ export default function MyBooking() {
               <div className="flex flex-col p-4 md:flex-row">
                 <div className="w-full mb-4 md:w-1/3 md:mb-0">
                   <div className="relative w-full h-48 overflow-hidden rounded-lg">
-                    <ImageSlider images={booking.images} />
+                    <ImageSlider
+                      images={booking.images}
+                      height="h-48"
+                      width="max-w-sm"
+                      className="rounded shadow"
+                    />
                   </div>
                 </div>
 

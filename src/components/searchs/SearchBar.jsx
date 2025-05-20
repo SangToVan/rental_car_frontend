@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { FaMapMarkerAlt, FaCalendarAlt, FaChevronLeft } from "react-icons/fa";
 import Select from "react-select";
-import { vietnamLocations } from "../../shared/locations";
 import TimeModal from "./modals/TimeModal";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearchInfor } from "../../shared/toolkits/searchSlice";
@@ -10,6 +9,7 @@ import {
   checkReturnDateTime,
   convertToLocalDateTime,
 } from "../../shared/utils";
+import { getProvinces } from "@do-kevin/pc-vn";
 
 export default function SearchBar({ onSubmit }) {
   const {
@@ -25,6 +25,11 @@ export default function SearchBar({ onSubmit }) {
   const searchInfor = useSelector((state) => state.search);
   const dispatch = useDispatch();
 
+  const provinces = getProvinces();
+  const locationOptions = provinces.map((p) => ({
+    label: p.name,
+    value: p.name,
+  }));
   const [location, setLocation] = useState(null);
   const [pickupDateTime, setPickupDateTime] = useState(null);
   const [returnDateTime, setReturnDateTime] = useState(null);
@@ -126,13 +131,13 @@ export default function SearchBar({ onSubmit }) {
               render={({ field }) => (
                 <Select
                   {...field}
-                  options={vietnamLocations}
+                  options={locationOptions}
                   placeholder="Chọn địa điểm"
                   classNamePrefix="react-select"
                   className="w-64"
                   isSearchable
-                  value={vietnamLocations.find(
-                    (option) => option.value === field.value
+                  value={locationOptions.find(
+                    (opt) => opt.value === field.value
                   )}
                   onChange={(selectedOption) => {
                     field.onChange(selectedOption.value);

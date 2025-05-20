@@ -8,7 +8,7 @@ import Button from "../components/ui/Button";
 import CarCard from "../components/searchs/CarCard";
 import BookingDetailModal from "../components/modals/BookingModal/BookingDetailModal";
 import BookingConfirmModal from "../components/modals/BookingModal/BookingConfirmModal";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getCarsById } from "../shared/apis/carApi";
 import { transmissionMap, fuelTypeMap } from "../shared/utils/labelMap";
 import { convertToQueryParams, currencyFormat } from "../shared/utils";
@@ -20,6 +20,8 @@ import {
 } from "../shared/utils/rentalPrice";
 import AdditionalFunctions from "../components/cars/AdditionalFunctions";
 import { ADDITIONAL_FUNCTIONS } from "../components/cars/CarConstants";
+import TimeModal from "../components/searchs/modals/TimeModal";
+import { setSearchInfor } from "../shared/toolkits/searchSlice";
 
 export default function CarDetail() {
   const { carId } = useParams();
@@ -31,15 +33,35 @@ export default function CarDetail() {
   const [endDate, setEndDate] = useState("05/04/2025 20:00");
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
   const [totalPrice, setTotalPrice] = useState(0);
   const [rentalDays, setRentalDays] = useState(1);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    getCarsById(carId).then((data) => {
-      setCar(data.data);
-      setImages(data.data?.images);
-    });
-  }, [carId]);
+    if (
+      searchInfor?.sD &&
+      searchInfor?.sT &&
+      searchInfor?.eD &&
+      searchInfor?.eT
+    ) {
+      const startDateTime = `${searchInfor.sD} ${searchInfor.sT}`;
+      const endDateTime = `${searchInfor.eD} ${searchInfor.eT}`;
+
+      setStartDate(startDateTime);
+      setEndDate(endDateTime);
+
+      getCarsById(carId, startDateTime, endDateTime).then((data) => {
+        setCar(data.data);
+        setImages(data.data?.images);
+      });
+    } else {
+      getCarsById(carId).then((data) => {
+        setCar(data.data);
+        setImages(data.data?.images);
+      });
+    }
+  }, [carId, searchInfor]);
 
   useEffect(() => {
     if (
@@ -78,6 +100,35 @@ export default function CarDetail() {
       setTotalPrice(total);
     }
   }, [startDate, endDate, car]);
+
+  const handleSelectTime = (time) => {
+    const start = `${time.sD} ${time.sT}`;
+    const end = `${time.eD} ${time.eT}`;
+
+    // 1. Cập nhật searchInfor trên Redux
+    dispatch(
+      setSearchInfor({
+        ...searchInfor,
+        sD: time.sD,
+        sT: time.sT,
+        eD: time.eD,
+        eT: time.eT,
+      })
+    );
+
+    // 2. Cập nhật local state
+    setStartDate(start);
+    setEndDate(end);
+
+    // 3. Gọi lại API với thời gian mới
+    getCarsById(carId, start, end).then((data) => {
+      setCar(data.data);
+      setImages(data.data?.images);
+    });
+
+    // 4. Đóng modal (nếu chưa gọi ở trong modal)
+    setIsTimeModalOpen(false);
+  };
 
   const handleOpenBookingModal = () => {
     setIsBookingModalOpen(true);
@@ -273,7 +324,8 @@ export default function CarDetail() {
                   type="text"
                   value={startDate}
                   readOnly
-                  className="w-full p-2 border border-gray-300 rounded-md focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  onClick={() => setIsTimeModalOpen(true)}
+                  className="w-full p-2 border cursor-pointer hover:border-primary focus:outline-none"
                 />
               </div>
 
@@ -285,9 +337,16 @@ export default function CarDetail() {
                   type="text"
                   value={endDate}
                   readOnly
-                  className="w-full p-2 border border-gray-300 rounded-md focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  onClick={() => setIsTimeModalOpen(true)}
+                  className="w-full p-2 border cursor-pointer hover:border-primary focus:outline-none"
                 />
               </div>
+
+              {car.canBooking === false && (
+                <p className="mb-4 text-sm text-red-500">
+                  * Xe không khả dụng trong khoảng thời gian đã chọn.
+                </p>
+              )}
 
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2 text-sm">
@@ -332,13 +391,18 @@ export default function CarDetail() {
                 </div>
               </div>
 
-              <Button className="w-full" disabled={car.isOwner}>
+              <Button
+                className="w-full"
+                disabled={car.isOwner || car.canBooking === false}
+              >
                 <Link
                   to={`/rent-car?carId=${carId}&${convertToQueryParams(
                     searchInfor
                   )}`}
                   className={
-                    car.isOwner ? "pointer-events-none text-gray-400" : ""
+                    car.isOwner || car.canBooking === false
+                      ? "pointer-events-none text-gray-400"
+                      : ""
                   }
                 >
                   THUÊ NGAY
@@ -399,6 +463,13 @@ export default function CarDetail() {
           </div>
         </div>
       </div>
+
+      {isTimeModalOpen && (
+        <TimeModal
+          onClose={() => setIsTimeModalOpen(false)}
+          onSelectTime={handleSelectTime}
+        />
+      )}
 
       {/* Booking Detail Modal */}
       <BookingDetailModal

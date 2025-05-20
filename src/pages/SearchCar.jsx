@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCarsApi } from "../shared/apis/carApi";
 
 export default function SearchCar() {
-  const [perPage, setPerPage] = useState(3);
+  const [perPage, setPerPage] = useState(4);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,6 +37,8 @@ export default function SearchCar() {
         setLoading(false);
       });
   }, [perPage, currentPage, sortType, searchInfor]);
+
+  console.log(cars.length);
 
   const handlePerPageChange = useCallback((e) => {
     const value = parseInt(e.target.value, 10);

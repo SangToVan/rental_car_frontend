@@ -62,7 +62,6 @@ export default function MyCar() {
           label: "Chờ xác thực",
           className: "bg-orange-100 text-orange-800",
         };
-      case "VERIFIED":
       case "ACTIVE":
         return {
           label: "Đã xác thực",
@@ -113,7 +112,12 @@ export default function MyCar() {
               className="overflow-hidden bg-white rounded-lg shadow"
             >
               <div className="flex flex-col md:flex-row">
-                <ImageSlider images={images} />
+                <ImageSlider
+                  images={images}
+                  height="h-64"
+                  width="max-w-sm"
+                  className="rounded shadow"
+                />
 
                 <div className="flex flex-col flex-1 p-6">
                   <div className="flex items-center mb-2">
@@ -125,7 +129,7 @@ export default function MyCar() {
                   </div>
                   <h2 className="mb-1 text-xl font-bold">{car.name}</h2>
 
-                  <div className="flex items-center mt-2">
+                  <div className="grid grid-cols-2 gap-2">
                     <div className="flex items-center mr-4 text-sm">
                       <FiStar className="mr-1 text-yellow-500" />
                       <span>
@@ -137,6 +141,12 @@ export default function MyCar() {
                     <div className="flex items-center mr-4 text-sm">
                       <FiUsers className="mr-1 text-blue-500" />
                       <span>{car.completeBookingCount} chuyến</span>
+                    </div>
+                    <div className="flex items-center mr-4 text-sm">
+                      <FiClock className="mr-1 text-orange-500" />
+                      <span>
+                        {car.inProgressBookingCount} đơn chưa hoàn thành
+                      </span>
                     </div>
                     <div className="flex items-center text-sm">
                       <FiClock className="mr-1 text-orange-500" />

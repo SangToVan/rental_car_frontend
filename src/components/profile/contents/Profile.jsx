@@ -834,14 +834,14 @@ const Profile = () => {
 
                 <div>
                   <label className="block mb-1 text-sm text-gray-700">
-                    Email
+                    Số CCCD
                   </label>
                   <input
-                    type="email"
+                    type="citizenId"
                     // onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder={userInfo.email}
-                    {...register("email", { required: true })}
+                    placeholder={userInfo?.citizenId}
+                    {...register("citizenId", { required: true })}
                   />
                 </div>
               </div>

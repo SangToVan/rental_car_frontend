@@ -65,7 +65,7 @@ export default function Step2({ newCar = {}, setNewCar, nextStep, onCancel }) {
               {...register("basePrice", { required: true })}
             />
             <div className="absolute text-gray-500 transform -translate-y-1/2 right-3 top-1/2">
-              K
+              VND
             </div>
           </div>
         </div>
@@ -227,7 +227,7 @@ export default function Step2({ newCar = {}, setNewCar, nextStep, onCancel }) {
                   />
                 </div>
                 <div className="text-sm font-medium text-right text-gray-700">
-                  {deliveryDistance}km
+                  {deliveryDistance} km
                 </div>
               </div>
 
@@ -256,13 +256,14 @@ export default function Step2({ newCar = {}, setNewCar, nextStep, onCancel }) {
                     type="range"
                     name="deliveryFee"
                     min="0"
-                    max="50"
+                    step={1000}
+                    max="50000"
                     className="absolute top-0 w-full h-2 opacity-0 cursor-pointer"
                     {...register("deliveryFee", { required: true })}
                   />
                 </div>
                 <div className="text-sm font-medium text-right text-gray-700">
-                  {deliveryFee}K
+                  {deliveryFee} VND
                 </div>
               </div>
 
@@ -299,7 +300,7 @@ export default function Step2({ newCar = {}, setNewCar, nextStep, onCancel }) {
                   />
                 </div>
                 <div className="text-sm font-medium text-right text-gray-700">
-                  {freeDeliveryDistance}km
+                  {freeDeliveryDistance} km
                 </div>
               </div>
             </div>
@@ -354,7 +355,7 @@ export default function Step2({ newCar = {}, setNewCar, nextStep, onCancel }) {
                   />
                 </div>
                 <div className="text-sm font-medium text-right text-gray-700">
-                  {kmPerDay}km
+                  {kmPerDay} km
                 </div>
               </div>
 
@@ -383,14 +384,14 @@ export default function Step2({ newCar = {}, setNewCar, nextStep, onCancel }) {
                     type="range"
                     name="kmOverdayFee"
                     min="0"
-                    max="10"
-                    step="1"
+                    max="10000"
+                    step="1000"
                     className="absolute top-0 w-full h-2 opacity-0 cursor-pointer"
                     {...register("kmOverDayFee", { required: true })}
                   />
                 </div>
                 <div className="text-sm font-medium text-right text-gray-700">
-                  {kmOverdayFee}K
+                  {kmOverdayFee} VND
                 </div>
               </div>
             </div>

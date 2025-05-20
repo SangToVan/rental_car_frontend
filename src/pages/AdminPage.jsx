@@ -16,8 +16,8 @@ import {
 const sidebarItems = [
   { key: "dashboard", label: "Dashboard", icon: BiHome },
   { key: "cars", label: "Danh sách xe", icon: BiCar },
-  { key: "bookings", label: "Danh sách đơn hàng", icon: BiCalendar },
-  { key: "escrow", label: "Ký quỹ", icon: BiShield },
+  { key: "bookings", label: "Đơn đặt xe", icon: BiCalendar },
+  { key: "escrow", label: "Giao dịch ký quỹ", icon: BiShield },
   { key: "user", label: "Người dùng", icon: BiUser },
 ];
 

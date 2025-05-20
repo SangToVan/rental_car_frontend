@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { FaCalendarAlt } from "react-icons/fa";
-import { vietnamLocations } from "../../shared/locations";
 import TimeModal from "../searchs/modals/TimeModal";
 import { useDispatch, useSelector } from "react-redux";
 import { setSearchInfor } from "../../shared/toolkits/searchSlice";
@@ -12,6 +11,7 @@ import {
 } from "../../shared/utils";
 import { Controller, useForm } from "react-hook-form";
 import { addDays, addHours } from "date-fns";
+import { getProvinces } from "@do-kevin/pc-vn";
 
 export default function SearchForm() {
   const {
@@ -28,6 +28,11 @@ export default function SearchForm() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const provinces = getProvinces();
+  const locationOptions = provinces.map((p) => ({
+    label: p.name,
+    value: p.name,
+  }));
   const today = new Date();
   const [pickupDateTime, setPickupDateTime] = useState(
     new Date(addHours(today, 2))
@@ -116,13 +121,11 @@ export default function SearchForm() {
             render={({ field }) => (
               <Select
                 {...field}
-                options={vietnamLocations}
+                options={locationOptions}
                 placeholder="Chọn địa điểm"
                 classNamePrefix="react-select"
                 isSearchable
-                value={vietnamLocations.find(
-                  (option) => option.value === field.value
-                )}
+                value={locationOptions.find((opt) => opt.value === field.value)}
                 onChange={(selectedOption) => {
                   field.onChange(selectedOption.value);
                 }}

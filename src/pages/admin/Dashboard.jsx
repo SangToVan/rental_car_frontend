@@ -69,9 +69,9 @@ export default function DashboardPanel() {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    getDashboardApi().then((data) => {
-      setAmount(data?.amount || 0);
-      setTransactions(data?.list || []);
+    getDashboardApi().then((res) => {
+      setAmount(res.data?.amount || 0);
+      setTransactions(res.data?.list || []);
     });
   }, []);
 
@@ -86,63 +86,75 @@ export default function DashboardPanel() {
       </div>
 
       {/* Lịch sử giao dịch */}
-      <div>
-        <h2 className="mb-3 text-lg font-semibold">Lịch sử giao dịch</h2>
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm bg-white border rounded-lg">
-            <thead>
-              <tr className="text-gray-700 bg-gray-50">
-                <th className="px-4 py-3 font-semibold">Ngày giao dịch</th>
-                <th className="px-4 py-3 font-semibold">Loại</th>
-                <th className="px-4 py-3 font-semibold">Số tiền</th>
-                <th className="px-4 py-3 font-semibold">Mô tả</th>
-                <th className="px-4 py-3 font-semibold">Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((tx, index) => (
-                <tr key={index} className="border-t last:border-b">
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    {formatDateTime(tx.transactionDate)}
-                  </td>
-                  <td className="px-4 py-2 whitespace-nowrap">
-                    <span className="inline-flex items-center px-2 py-1 text-xs font-bold text-gray-700 bg-gray-100 rounded">
-                      {getTypeIcon(tx.transactionType)} {tx.transactionType}
-                    </span>
-                  </td>
-                  <td
-                    className={`px-4 py-2 text-right font-semibold ${getAmountColor(
-                      tx.transactionType
-                    )}`}
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-sm bg-white border rounded-lg table-auto">
+          <thead>
+            <tr className="text-center text-gray-700 bg-gray-50">
+              <th className="px-4 py-3 font-semibold align-middle whitespace-nowrap">
+                Ngày giao dịch
+              </th>
+              <th className="px-4 py-3 font-semibold align-middle whitespace-nowrap">
+                Loại
+              </th>
+              <th className="px-4 py-3 font-semibold align-middle whitespace-nowrap">
+                Số tiền
+              </th>
+              <th className="px-4 py-3 font-semibold align-middle whitespace-nowrap">
+                Mô tả
+              </th>
+              <th className="px-4 py-3 font-semibold align-middle whitespace-nowrap">
+                Trạng thái
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {transactions.map((tx, index) => (
+              <tr
+                key={index}
+                className="text-center align-middle border-t last:border-b"
+              >
+                <td className="px-4 py-2 align-middle whitespace-nowrap">
+                  {formatDateTime(tx.transactionDate)}
+                </td>
+                <td className="px-4 py-2 align-middle whitespace-nowrap">
+                  <span className="inline-flex items-center px-2 py-1 text-xs font-bold text-gray-700 bg-gray-100 rounded">
+                    {getTypeIcon(tx.transactionType)} {tx.transactionType}
+                  </span>
+                </td>
+                <td
+                  className={`px-4 py-2 font-semibold whitespace-nowrap align-middle ${getAmountColor(
+                    tx.transactionType
+                  )}`}
+                >
+                  {formatCurrency(parseFloat(tx.amount))}
+                </td>
+                <td className="px-4 py-2 align-middle whitespace-nowrap">
+                  {tx.description}
+                </td>
+                <td className="px-4 py-2 align-middle whitespace-nowrap">
+                  <span
+                    className={`px-3 py-1 text-xs font-semibold rounded ${getStatusColor(
+                      tx.status
+                    )} bg-gray-100`}
                   >
-                    {formatCurrency(tx.amount)}
-                  </td>
-                  <td className="px-4 py-2">{tx.description}</td>
-                  <td className="px-4 py-2">
-                    <span
-                      className={`px-3 py-1 text-xs font-semibold rounded ${getStatusColor(
-                        tx.status
-                      )} bg-gray-100`}
-                    >
-                      {tx.status === "SUCCESS"
-                        ? "Thành công"
-                        : tx.status === "PENDING"
-                        ? "Đang xử lý"
-                        : "Thất bại"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {transactions.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-6 text-center text-gray-400">
-                    Không có giao dịch nào
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                    {tx.status === "SUCCESS"
+                      ? "Thành công"
+                      : tx.status === "PENDING"
+                      ? "Đang xử lý"
+                      : "Thất bại"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+            {transactions.length === 0 && (
+              <tr>
+                <td colSpan={5} className="py-6 text-center text-gray-400">
+                  Không có giao dịch nào
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

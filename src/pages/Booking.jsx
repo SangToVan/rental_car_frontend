@@ -1,17 +1,8 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import BookingSummary from "../components/bookings/booking-infor/BookingSummary";
-import CarInformation from "../components/bookings/booking-infor/CarInformation";
-import OwnerInformation from "../components/bookings/booking-infor/OwnerInformation";
-import BookingNotice from "../components/bookings/common/BookingNotice";
-import CancellationPolicy from "../components/bookings/common/CancellationPolicy";
-import RentalAccessories from "../components/bookings/common/RentalAccessories";
 import RentalDocuments from "../components/bookings/common/RentalDocuments";
-import RentalPeriod from "../components/bookings/common/RentalPeriod";
-import RentalTerms from "../components/bookings/common/RentalTerms";
 import { useEffect, useState } from "react";
 import RequestError from "./error/RequestError";
 import ProgressSteps from "../components/bookings/ProgressSteps";
-import { mockBookings } from "../utils/mockData";
 import { getCarsById } from "../shared/apis/carApi";
 import { currencyFormat } from "../shared/utils";
 import {
@@ -21,6 +12,9 @@ import {
   PASSENGER_INSURANCE_FEE_PER_DAY,
 } from "../shared/utils/rentalPrice";
 import { addBookingApi } from "../shared/apis/bookingApi";
+import ImageSlider from "../components/common/ImageSlider";
+import { fuelTypeMap, transmissionMap } from "../shared/utils/labelMap";
+import AddressModal from "../components/modals/AddressModal/AddressModal";
 
 export default function Booking() {
   const [searchParams] = useSearchParams();
@@ -35,6 +29,12 @@ export default function Booking() {
   const [documentRental, setDocumentRental] = useState("NATIVE");
   const [driverInfo, setDriverInfo] = useState({});
   const [bookingResData, setBookingResData] = useState(null);
+  const [pickupAddress, setPickupAddress] = useState("");
+  const [returnAddress, setReturnAddress] = useState("");
+
+  const [isPickupModalOpen, setIsPickupModalOpen] = useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const requiredParams = ["carId", "location", "sD", "sT", "eD", "eT"];
@@ -157,55 +157,49 @@ export default function Booking() {
 
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
-            <div className="grid grid-cols-1 gap-8 mb-8 bg-white rounded-lg shadow-sm lg:grid-cols-12">
-              <div className="m-4 lg:col-span-12">
-                <div className="flex flex-col mb-6 md:flex-row">
-                  <div className="pr-4 md:w-1/2">
-                    <img
-                      src={car?.images[0].imageUrl}
-                      alt={car?.name}
-                      className="object-cover w-full h-auto rounded-lg aspect-video"
-                    />
+            <div className="p-4 bg-white rounded-md shadow-sm">
+              <h2 className="mb-4 text-xl font-semibold text-gray-800">
+                Thông tin xe
+              </h2>
+              <div className="flex flex-col gap-4 md:flex-row">
+                <div>
+                  <ImageSlider images={car?.images || []} height="h-64" />
+                </div>
+
+                <div className="space-y-4 text-sm text-gray-700 md:flex-1">
+                  <div>
+                    <span className="block font-medium text-gray-600">
+                      Tên xe
+                    </span>
+                    <div className="text-base font-semibold text-gray-800">
+                      {car?.name}
+                    </div>
                   </div>
-                  <div className="mt-4 md:w-1/2 md:mt-0">
-                    <h2 className="text-xl font-bold uppercase">{car?.name}</h2>
-                    <div className="flex items-center mt-1">
-                      <span className="text-sm text-gray-600">{car?.type}</span>
-                    </div>
-                    <div className="flex items-center mt-1">
-                      <svg
-                        viewBox="0 0 24 24"
-                        className="h-4 w-4 fill-[#ffc107]"
-                      >
-                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                      </svg>
-                      <span className="ml-1 font-medium">{car?.rating}</span>
-                      <span className="mx-1">•</span>
-                      <span className="text-sm text-gray-600">
-                        {car?.trips} chuyến
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <div>
+                      <span className="block font-medium text-gray-600">
+                        Số chỗ
                       </span>
+                      {car?.numberOfSeats} chỗ
                     </div>
-                    <div className="flex items-center mt-2">
-                      <svg
-                        className="w-4 h-4 text-gray-500"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                        />
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                        />
-                      </svg>
-                      <span className="ml-2 text-sm">{car?.address}</span>
+                    <div>
+                      <span className="block font-medium text-gray-600">
+                        Loại nhiên liệu
+                      </span>
+                      {fuelTypeMap[car?.fuelType]}
+                    </div>
+                    <div>
+                      <span className="block font-medium text-gray-600">
+                        Hộp số
+                      </span>
+                      {transmissionMap[car?.transmission]}
+                    </div>
+                    <div className="sm:col-span-2">
+                      <span className="block font-medium text-gray-600">
+                        Địa chỉ xe
+                      </span>
+                      {car?.address}
                     </div>
                   </div>
                 </div>
@@ -271,6 +265,57 @@ export default function Booking() {
                   </div>
                 </div>
               </div>
+
+              <div className="p-6 mb-6 bg-white border border-gray-200 rounded-lg">
+                <h3 className="mb-4 text-lg font-semibold text-gray-800">
+                  Thông tin địa điểm
+                </h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block mb-1 font-medium text-gray-700">
+                      Địa điểm nhận xe
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsPickupModalOpen(true)}
+                      className="w-full px-4 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#61c596]"
+                    >
+                      {pickupAddress || "Chọn địa chỉ nhận xe"}
+                    </button>
+                    <AddressModal
+                      isOpen={isPickupModalOpen}
+                      onClose={() => setIsPickupModalOpen(false)}
+                      onApply={(address) => {
+                        setPickupAddress(address);
+                        setIsPickupModalOpen(false);
+                      }}
+                      initialAddress={pickupAddress}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-1 font-medium text-gray-700">
+                      Địa điểm trả xe
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setIsReturnModalOpen(true)}
+                      className="w-full px-4 py-2 text-left border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#61c596]"
+                    >
+                      {returnAddress || "Chọn địa chỉ trả xe"}
+                    </button>
+                    <AddressModal
+                      isOpen={isReturnModalOpen}
+                      onClose={() => setIsReturnModalOpen(false)}
+                      onApply={(address) => {
+                        setReturnAddress(address);
+                        setIsReturnModalOpen(false);
+                      }}
+                      initialAddress={returnAddress}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
             <RentalDocuments
               onChange={({ documentType, driver }) => {
@@ -299,8 +344,12 @@ export default function Booking() {
                     <p className="text-lg font-medium">
                       {car?.carOwner.username}
                     </p>
+                    <p className="text-sm text-gray-500">
+                      Tham gia từ: {car?.carOwner.createdAt}
+                    </p>
                   </div>
                 </div>
+
                 <div className="flex items-center mb-4">
                   <svg viewBox="0 0 24 24" className="h-4 w-4 fill-[#ffc107]">
                     <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />

@@ -21,6 +21,8 @@ import {
   INSURANCE_FEE_PER_DAY,
   PASSENGER_INSURANCE_FEE_PER_DAY,
 } from "../shared/utils/rentalPrice";
+import ImageSlider from "../components/common/ImageSlider";
+import { fuelTypeMap, transmissionMap } from "../shared/utils/labelMap";
 
 export default function OwnerBookingDetail() {
   const [bookingDetails, setBookingDetails] = useState(null);
@@ -69,6 +71,7 @@ export default function OwnerBookingDetail() {
     const { message } = await confirmBookingApi(bookingId);
     toast.success(message);
     setShowConfirmBookingModal(false);
+    window.location.reload();
     navigate(`/owner/booking/${bookingId}`);
   };
 
@@ -76,13 +79,15 @@ export default function OwnerBookingDetail() {
     const { message } = await cancelBookingApi(bookingId);
     toast.success(message);
     setShowCancelModal(false);
-    navigate(`/owner/bookings/${bookingId}`);
+    window.location.reload();
+    navigate(`/owner/booking/${bookingId}`);
   };
 
   const handleConfirmReturn = async () => {
     const { message } = await confirmReturnApi(bookingId);
     toast.success(message);
     setShowConfirmReturnModal(false);
+    window.location.reload();
     navigate(`/owner/bookings/${bookingId}`);
   };
 
@@ -90,7 +95,8 @@ export default function OwnerBookingDetail() {
     const { message } = await completeBookingApi(bookingId);
     toast.success(message);
     setShowCompleteBookingModal(false);
-    navigate(`/owner/bookings/${bookingId}`);
+    window.location.reload();
+    //navigate(`/owner/bookings/${bookingId}`);
   };
 
   // Update currentStep based on bookingStatus
@@ -125,40 +131,65 @@ export default function OwnerBookingDetail() {
     <div className="p-6 mb-6 bg-white rounded-lg shadow-sm">
       <h3 className="mb-4 text-lg font-semibold text-gray-800">Thông tin xe</h3>
       <div className="flex flex-col gap-4 md:flex-row">
+        {/* Ảnh xe */}
         <div className="md:w-1/3">
-          <img
-            src={carInfor.images[0].imageUrl}
-            alt={carInfor.name}
-            className="object-cover w-full h-auto rounded-lg"
-          />
+          <ImageSlider images={carInfor.images} height="h-64" />
         </div>
-        <div className="md:w-2/3">
+
+        {/* Thông tin chi tiết */}
+        <div className="space-y-3 md:w-2/3">
           <h4 className="text-xl font-medium text-gray-800">
             {carInfor?.name}
           </h4>
-          <div className="grid grid-cols-1 mt-3 md:grid-cols-2 gap-y-3">
-            <div>
-              <p className="text-gray-600">Loại xe:</p>
-              <p className="font-medium">{carInfor?.type}</p>
-            </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4">
             <div>
               <p className="text-gray-600">Số ghế:</p>
               <p className="font-medium">{carInfor?.numberOfSeats} chỗ</p>
             </div>
             <div>
-              <p className="text-gray-600">Nhiên liệu:</p>
-              <p className="font-medium">{carInfor?.fuelType}</p>
+              <p className="text-gray-600">Truyền động:</p>
+              <p className="font-medium">
+                {transmissionMap[carInfor?.transmission] ||
+                  carInfor?.transmission}
+              </p>
             </div>
             <div>
-              <p className="text-gray-600">Tiêu thụ:</p>
+              <p className="text-gray-600">Nhiên liệu:</p>
+              <p className="font-medium">
+                {fuelTypeMap[carInfor?.fuelType] || carInfor?.fuelType}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-600">Tiêu hao nhiên liệu:</p>
               <p className="font-medium">{carInfor?.fuelConsumption} L/100km</p>
             </div>
+            <div>
+              <p className="text-gray-600">Số km đã đi:</p>
+              <p className="font-medium">
+                {carInfor?.mileage?.toLocaleString()} km
+              </p>
+            </div>
+            {/* Mô tả */}
+            {carInfor?.description && (
+              <div>
+                <p className="text-gray-600 ">Mô tả xe:</p>
+                <p className="font-medium">{carInfor.description}</p>
+              </div>
+            )}
+
+            {/* Chức năng bổ sung */}
+            {carInfor?.additionalFunctions && (
+              <div>
+                <p className="text-gray-600 ">Chức năng khác:</p>
+                <p className="font-medium">{carInfor.additionalFunctions}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
     </div>
   );
-
   // Helper function to render customer details
   const renderCustomerDetails = () => (
     <div className="p-6 mb-6 bg-white rounded-lg shadow-sm">
@@ -201,6 +232,68 @@ export default function OwnerBookingDetail() {
     </div>
   );
 
+  const renderDriverInfo = () => {
+    const documentType = bookingDetails?.documentRental;
+
+    // Nếu không có bằng lái, hiện thông tin người lái riêng
+    if (documentType === "NONE") {
+      return (
+        <div className="p-6 mb-6 bg-white rounded-lg shadow-sm">
+          <h3 className="mb-4 text-lg font-semibold text-gray-800">
+            Thông tin người lái xe
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3">
+            <div>
+              <p className="text-gray-600">Họ tên:</p>
+              <p className="font-medium">{bookingDetails?.driverName}</p>
+            </div>
+            <div>
+              <p className="text-gray-600">Số điện thoại:</p>
+              <p className="font-medium">{bookingDetails?.driverPhone}</p>
+            </div>
+            <div>
+              <p className="text-gray-600">CMND/CCCD:</p>
+              <p className="font-medium">{bookingDetails?.driverCitizenId}</p>
+            </div>
+            <div>
+              <p className="text-gray-600">Mối quan hệ với người thuê:</p>
+              <p className="font-medium">
+                {bookingDetails?.relationship || "Không rõ"}
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Ngược lại, chính khách hàng là người lái
+    return (
+      <div className="p-6 mb-6 bg-white rounded-lg shadow-sm">
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          Thông tin người lái xe
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3">
+          <div>
+            <p className="text-gray-600">Họ tên:</p>
+            <p className="font-medium">{renterInfor?.username}</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Số điện thoại:</p>
+            <p className="font-medium">{renterInfor?.phoneNumber}</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Email:</p>
+            <p className="font-medium">{renterInfor?.email}</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Ngày sinh:</p>
+            <p className="font-medium">{renterInfor?.birthday}</p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Helper function to render booking details
   const renderBookingDetails = () => (
     <div className="p-6 mb-6 bg-white rounded-lg shadow-sm">
@@ -240,45 +333,68 @@ export default function OwnerBookingDetail() {
       <h3 className="mb-4 text-lg font-semibold text-gray-800">
         Thông tin thanh toán
       </h3>
-      <div className="space-y-3">
-        <div className="flex justify-between py-2 border-b border-gray-200">
+
+      {/* Nhóm 1: Đơn giá */}
+      <h4 className="mb-2 text-sm font-semibold text-gray-600 uppercase">
+        Đơn giá theo ngày
+      </h4>
+      <div className="mb-4 space-y-2">
+        <div className="flex justify-between">
           <span className="text-gray-600">Giá thuê xe:</span>
-          <span className="font-medium text-gray-800">
-            {currencyFormat(carInfor?.basePrice)}/ngày
-          </span>
+          <span>{currencyFormat(carInfor?.basePrice)}/ngày</span>
         </div>
-        <div className="flex justify-between py-2 border-b border-gray-200">
+        <div className="flex justify-between">
           <span className="text-gray-600">Bảo hiểm thuê xe:</span>
-          <span className="font-medium text-gray-800">
-            {currencyFormat(INSURANCE_FEE_PER_DAY)}/ngày
-          </span>
+          <span>{currencyFormat(INSURANCE_FEE_PER_DAY)}/ngày</span>
         </div>
-        <div className="flex justify-between py-2 border-b border-gray-200">
+        <div className="flex justify-between">
           <span className="text-gray-600">Bảo hiểm người trên xe:</span>
-          <span className="font-medium text-gray-800">
-            {currencyFormat(PASSENGER_INSURANCE_FEE_PER_DAY)}/ngày
-          </span>
+          <span>{currencyFormat(PASSENGER_INSURANCE_FEE_PER_DAY)}/ngày</span>
         </div>
-        <div className="flex justify-between py-2 border-b border-gray-200">
-          <span className="font-semibold text-gray-700">Tổng cộng / ngày:</span>
-          <span className="font-semibold text-gray-800">
-            {currencyFormat(
-              carInfor?.basePrice +
-                INSURANCE_FEE_PER_DAY +
-                PASSENGER_INSURANCE_FEE_PER_DAY
-            )}
-          </span>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Số ngày thuê:</span>
+          <span>{rentalDays} ngày</span>
         </div>
-        <div className="flex justify-between py-2 border-b border-gray-200">
-          <span className="font-semibold text-gray-700">Số ngày thuê:</span>
-          <span className="font-semibold text-gray-800">{rentalDays} ngày</span>
+      </div>
+
+      <hr className="my-3 border-gray-200" />
+
+      {/* Nhóm 2: Tổng tiền */}
+      <h4 className="mb-2 text-sm font-semibold text-gray-600 uppercase">
+        Tổng tiền
+      </h4>
+      <div className="flex justify-between py-2 mb-2">
+        <span className="font-medium text-gray-800">Thành tiền:</span>
+        <span className="text-lg font-semibold text-primary">
+          {currencyFormat(bookingDetails?.totalPrice)}
+        </span>
+      </div>
+
+      <hr className="my-3 border-gray-200" />
+
+      {/* Nhóm 3: Thanh toán */}
+      <h4 className="mb-2 text-sm font-semibold text-gray-600 uppercase">
+        Trạng thái thanh toán
+      </h4>
+      <div className="space-y-2">
+        <div className="flex justify-between">
+          <span className="text-gray-600">Đã thanh toán:</span>
+          <span>{currencyFormat(bookingDetails?.totalPaidAmount)}</span>
         </div>
-        <div className="flex justify-between py-2 border-b border-gray-200">
-          <span className="font-semibold text-primary">Thành tiền:</span>
-          <span className="font-semibold text-primary">
-            {currencyFormat(bookingDetails?.totalPrice)}
-          </span>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Tiền mặt cần thanh toán:</span>
+          <span>{currencyFormat(bookingDetails?.needToPayInCash)}</span>
         </div>
+        <div className="flex justify-between">
+          <span className="text-gray-600">Tiền đặt cọc:</span>
+          <span>{currencyFormat(bookingDetails?.depositAmount)}</span>
+        </div>
+        {parseFloat(bookingDetails?.refundAmount) > 0 && (
+          <div className="flex justify-between">
+            <span className="text-gray-600">Số tiền hoàn trả:</span>
+            <span>{currencyFormat(bookingDetails?.refundAmount)}</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -296,6 +412,7 @@ export default function OwnerBookingDetail() {
               notificationText="Chờ khách hàng thanh toán"
             />
             {renderCustomerDetails()}
+            {renderDriverInfo()}
             {renderBookingDetails()}
             {renderCarDetails()}
             {renderPaymentDetails()}
@@ -323,10 +440,17 @@ export default function OwnerBookingDetail() {
               notificationText="Khách hàng đã thanh toán, vui lòng xác nhận đơn hàng"
             />
             {renderCustomerDetails()}
+            {renderDriverInfo()}
             {renderBookingDetails()}
             {renderCarDetails()}
             {renderPaymentDetails()}
             <div className="flex justify-end gap-4 mt-4">
+              <button
+                className="px-6 py-3 font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600"
+                onClick={() => setShowCancelModal(true)}
+              >
+                Huỷ yêu cầu
+              </button>
               <button
                 className="px-6 py-3 font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600"
                 onClick={() => setShowConfirmBookingModal(true)}
@@ -344,6 +468,7 @@ export default function OwnerBookingDetail() {
               notificationText="Đơn đặt xe đã được xác nhận, chờ ngày khởi hành"
             />
             {renderCustomerDetails()}
+            {renderDriverInfo()}
             {renderBookingDetails()}
             {renderCarDetails()}
             {renderPaymentDetails()}
@@ -357,6 +482,7 @@ export default function OwnerBookingDetail() {
               notificationText="Đơn đặt xe đang được tiến hành"
             />
             {renderCustomerDetails()}
+            {renderDriverInfo()}
             {renderBookingDetails()}
             {renderCarDetails()}
             {renderPaymentDetails()}
@@ -384,6 +510,7 @@ export default function OwnerBookingDetail() {
               notificationText="Hãy xác nhận hoàn thành đơn hàng để nhận tiền"
             />
             {renderCustomerDetails()}
+            {renderDriverInfo()}
             {renderBookingDetails()}
             {renderCarDetails()}
             {renderPaymentDetails()}
@@ -405,6 +532,7 @@ export default function OwnerBookingDetail() {
               notificationText="Đơn hàng đã hoàn thành"
             />
             {renderCustomerDetails()}
+            {renderDriverInfo()}
             {renderBookingDetails()}
             {renderCarDetails()}
             {renderPaymentDetails()}
@@ -426,6 +554,7 @@ export default function OwnerBookingDetail() {
               notificationText="Đơn hàng đã bị hủy"
             />
             {renderCustomerDetails()}
+            {renderDriverInfo()}
             {renderBookingDetails()}
             {renderCarDetails()}
             {renderPaymentDetails()}

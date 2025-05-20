@@ -24,16 +24,14 @@ import {
   startOfMonth,
   addHours,
   addDays,
+  parse,
 } from "date-fns";
 import { vi } from "date-fns/locale";
+import { useSelector } from "react-redux";
 
 export default function TimeModal({ onClose, onSelectTime }) {
   const today = new Date();
   const [currentMonth, setCurrentMonth] = useState(today);
-  const [pickupDate, setPickupDate] = useState(new Date(addHours(today, 2)));
-  const [returnDate, setReturnDate] = useState(new Date(addDays(pickupDate, 2)));
-  const [pickupTime, setPickupTime] = useState("21:00");
-  const [returnTime, setReturnTime] = useState("20:00");
   const [error, setError] = useState(null);
   const nextMonth = addMonths(currentMonth, 1);
   const [selectionState, setSelectionState] = useState("pickup");
@@ -52,6 +50,49 @@ export default function TimeModal({ onClose, onSelectTime }) {
     return options;
   };
   const timeOptions = generateTimeOptions();
+  const searchInfor = useSelector((state) => state.search);
+
+  const [pickupDate, setPickupDate] = useState(new Date(addDays(today, 1)));
+  const [returnDate, setReturnDate] = useState(new Date(addDays(today, 3)));
+  const [pickupTime, setPickupTime] = useState("8:00");
+  const [returnTime, setReturnTime] = useState("20:00");
+
+  useEffect(() => {
+    if (
+      searchInfor?.sD &&
+      searchInfor?.sT &&
+      searchInfor?.eD &&
+      searchInfor?.eT
+    ) {
+      const parseDateTime = (dateStr, timeStr) => {
+        const combined = `${dateStr} ${timeStr}`;
+
+        const isSlashFormat = dateStr.includes("/"); // "dd/MM/yyyy"
+        const formatPattern = isSlashFormat
+          ? "dd/MM/yyyy HH:mm"
+          : "yyyy-MM-dd HH:mm";
+
+        const parsed = parse(combined, formatPattern, new Date());
+        return isNaN(parsed) ? new Date() : parsed;
+      };
+
+      const pickup = parseDateTime(searchInfor.sD, searchInfor.sT);
+      const ret = parseDateTime(searchInfor.eD, searchInfor.eT);
+
+      setPickupDate(pickup);
+      setReturnDate(ret);
+
+      if (timeOptions.includes(searchInfor.sT)) {
+        setPickupTime(searchInfor.sT);
+      }
+
+      if (timeOptions.includes(searchInfor.eT)) {
+        setReturnTime(searchInfor.eT);
+      }
+
+      setCurrentMonth(pickup);
+    }
+  }, [searchInfor]);
 
   useEffect(() => {
     if (pickupDate && returnDate) {

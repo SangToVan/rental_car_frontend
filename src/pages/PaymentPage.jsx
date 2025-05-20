@@ -93,8 +93,8 @@ export default function PaymentPage({ bookingId, onCancel }) {
               onChange={(e) => setPaymentMethod(e.target.value)}
               className="w-full px-4 py-2 border rounded"
             >
-              <option value="WALLET">Ví (Wallet)</option>
-              <option value="BANK">Ví điện tử / Ngân hàng</option>
+              <option value="WALLET">Ví Saoto</option>
+              <option value="BANK">Thẻ ngân hàng (VNPay)</option>
             </select>
           </div>
 
